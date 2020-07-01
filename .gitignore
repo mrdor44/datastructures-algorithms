@@ -30,4 +30,9 @@
 *.exe
 *.out
 *.app
+
+# .idea
 .idea/deployment.xml
+
+# CMake
+cmake-build-*/*
