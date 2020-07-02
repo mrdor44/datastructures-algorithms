@@ -6,7 +6,6 @@
 #define DATASTRUCTURES_ALGORITHMS_LIST_HPP
 
 #include <memory>
-#include "node.hpp"
 
 template<typename T>
 class List {
@@ -28,20 +27,37 @@ public:
     const T& front() const;
 
 private:
-    NodePtr<T> m_first_dummy;
-    NodePtr<T> m_last_dummy;
+    struct Node;
+    using NodePtr = std::shared_ptr<Node>;
+
+    struct Node {
+        T value;
+        NodePtr next;
+        NodePtr prev;
+
+        Node() = default;
+        Node(const T& value, const NodePtr next, const NodePtr prev);
+    };
+
+private:
+    NodePtr m_first_dummy;
+    NodePtr m_last_dummy;
     int m_length;
 
 private:
-    NodePtr<T> get_node(int) const;
-    void insert_before(const NodePtr<T>& node, const T& value);
-    void erase(const NodePtr<T>);
+    NodePtr get_node(int) const;
+    void insert_before(const NodePtr& node, const T& value);
+    void erase(const NodePtr);
 };
 
 template<typename T>
+List<T>::Node::Node(const T& value, const NodePtr next, const NodePtr prev)
+        : value(value), next(next), prev(prev) {}
+
+template<typename T>
 List<T>::List() :
-        m_first_dummy(std::make_shared<Node<T>>()),
-        m_last_dummy(std::make_shared<Node<T>>()),
+        m_first_dummy(std::make_shared<Node>()),
+        m_last_dummy(std::make_shared<Node>()),
         m_length(0) {
     m_first_dummy->next = m_last_dummy;
     m_last_dummy->prev = m_first_dummy;
@@ -105,8 +121,8 @@ const T& List<T>::front() const {
 }
 
 template<typename T>
-NodePtr<T> List<T>::get_node(int index) const {
-    NodePtr<T> node = m_first_dummy->next;
+typename List<T>::NodePtr List<T>::get_node(int index) const {
+    NodePtr node = m_first_dummy->next;
     for (int i = 0; i < index; ++i) {
         node = node->next;
     }
@@ -114,15 +130,15 @@ NodePtr<T> List<T>::get_node(int index) const {
 }
 
 template<typename T>
-void List<T>::insert_before(const NodePtr<T>& node, const T& value) {
-    NodePtr<T> new_node = std::make_shared<Node<T>>(value, node, node->prev);
+void List<T>::insert_before(const NodePtr& node, const T& value) {
+    NodePtr new_node = std::make_shared<Node>(value, node, node->prev);
     node->prev = new_node;
     new_node->prev->next = new_node;
     ++m_length;
 }
 
 template<typename T>
-void List<T>::erase(const NodePtr<T> node) {
+void List<T>::erase(const NodePtr node) {
     node->next->prev = node->prev;
     node->prev->next = node->next;
     --m_length;
