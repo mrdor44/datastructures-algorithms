@@ -25,6 +25,7 @@ public:
 
     const T& operator[](int) const;
     const T& front() const;
+    const T& back() const;
 
 private:
     struct Node;
@@ -118,6 +119,11 @@ const T& List<T>::operator[](int index) const {
 template<typename T>
 const T& List<T>::front() const {
     return (*this)[0];
+}
+
+template<typename T>
+const T& List<T>::back() const {
+    return m_last_dummy->prev->value;
 }
 
 template<typename T>

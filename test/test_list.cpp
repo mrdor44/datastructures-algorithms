@@ -23,6 +23,7 @@ TEST(List, InsertAndPopFront) {
     List<int> list;
     list.insert(0, 0);
     list.insert(1, 1);
+    EXPECT_EQ(1, list.back());
     EXPECT_EQ(0, list[0]);
     EXPECT_EQ(1, list[1]);
     list.pop_front();

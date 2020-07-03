@@ -10,6 +10,8 @@ add_cutie_tests_target(
         test/test_list.cpp
         test/test_stack.cpp
         test/test_queue.cpp
+        test/test_graph.cpp
         inc/list.hpp
         inc/stack.hpp
-        inc/queue.hpp)
+        inc/queue.hpp
+        inc/graph.hpp)
