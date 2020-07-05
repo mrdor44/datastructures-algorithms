@@ -2,7 +2,8 @@
 #include "mock.hpp"
 
 TEST(Graph, Circle) {
-    const Graph<int>::NodePtr& n1 = Graph<int>::create(1);
+    Graph<int> graph;
+    const Graph<int>::NodePtr& n1 = graph.add_root(1);
     const Graph<int>::NodePtr& n2 = n1->add_neighbor(2);
     const Graph<int>::NodePtr& n3 = n2->add_neighbor(3);
     n3->add_neighbor(n1);

@@ -14,8 +14,11 @@ public:
     virtual ~Queue() = default;
 
     void enqueue(const T&);
+    template<typename Iterable>
+    void enqueue(const Iterable&);
     void dequeue();
     const T& next() const;
+    bool is_empty() const;
 
 private:
     List<T> m_list;
@@ -27,6 +30,14 @@ void Queue<T>::enqueue(const T& value) {
 }
 
 template<typename T>
+template<typename Iterable>
+void Queue<T>::enqueue(const Iterable& iterable) {
+    for (const T& e : iterable) {
+        enqueue(e);
+    }
+}
+
+template<typename T>
 void Queue<T>::dequeue() {
     m_list.pop_front();
 }
@@ -34,6 +45,11 @@ void Queue<T>::dequeue() {
 template<typename T>
 const T& Queue<T>::next() const {
     return m_list.front();
+}
+
+template<typename T>
+bool Queue<T>::is_empty() const {
+    return m_list.is_empty();
 }
 
 #endif //DATASTRUCTURES_ALGORITHMS_STACK_HPP

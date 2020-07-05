@@ -1,6 +1,7 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
     <Objective-C>
+      <option name="INDENT_NAMESPACE_MEMBERS" value="0" />
       <option name="SPACE_BEFORE_POINTER_IN_DECLARATION" value="false" />
       <option name="SPACE_AFTER_POINTER_IN_DECLARATION" value="true" />
       <option name="SPACE_BEFORE_REFERENCE_IN_DECLARATION" value="false" />

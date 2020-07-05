@@ -6,6 +6,8 @@
 #define DATASTRUCTURES_ALGORITHMS_LIST_HPP
 
 #include <memory>
+#include <stdexcept>
+#include <sstream>
 
 template<typename T>
 class List {
@@ -22,14 +24,34 @@ public:
     void erase(int index);
     void clear();
     [[nodiscard]] int length() const;
+    [[nodiscard]] bool is_empty() const;
 
     const T& operator[](int) const;
     const T& front() const;
     const T& back() const;
 
-private:
     struct Node;
     using NodePtr = std::shared_ptr<Node>;
+
+    class const_iterator {
+    protected:
+        explicit const_iterator(const NodePtr&);
+
+    public:
+        virtual ~const_iterator() = default;
+
+        bool operator!=(const const_iterator&) const;
+        const_iterator& operator++();
+        const T& operator*() const;
+
+        friend class List<T>;
+
+    private:
+        NodePtr m_node;
+    };
+
+    const_iterator begin() const;
+    const_iterator end() const;
 
     struct Node {
         T value;
@@ -37,7 +59,7 @@ private:
         NodePtr prev;
 
         Node() = default;
-        Node(const T& value, const NodePtr next, const NodePtr prev);
+        Node(const T& value, const NodePtr& next, const NodePtr& prev);
     };
 
 private:
@@ -52,7 +74,7 @@ private:
 };
 
 template<typename T>
-List<T>::Node::Node(const T& value, const NodePtr next, const NodePtr prev)
+List<T>::Node::Node(const T& value, const NodePtr& next, const NodePtr& prev)
         : value(value), next(next), prev(prev) {}
 
 template<typename T>
@@ -68,6 +90,9 @@ template<typename T>
 List<T>::~List() {
     clear();
 }
+
+template<typename T>
+List<T>::const_iterator::const_iterator(const List::NodePtr& node) : m_node(node) {}
 
 template<typename T>
 void List<T>::push_front(const T& value) {
@@ -91,11 +116,21 @@ void List<T>::pop_back() {
 
 template<typename T>
 void List<T>::insert(int index, const T& value) {
+    if (index > m_length) {
+        std::ostringstream message;
+        message << "insert(" << index << "), m_length=" << m_length;
+        throw std::out_of_range(message.str());
+    }
     insert_before(get_node(index), value);
 }
 
 template<typename T>
 void List<T>::erase(int index) {
+    if (index >= m_length) {
+        std::ostringstream message;
+        message << "erase(" << index << "), m_length=" << m_length;
+        throw std::out_of_range(message.str());
+    }
     erase(get_node(index));
 }
 
@@ -112,6 +147,11 @@ int List<T>::length() const {
 }
 
 template<typename T>
+bool List<T>::is_empty() const {
+    return length() == 0;
+}
+
+template<typename T>
 const T& List<T>::operator[](int index) const {
     return get_node(index)->value;
 }
@@ -124,6 +164,32 @@ const T& List<T>::front() const {
 template<typename T>
 const T& List<T>::back() const {
     return m_last_dummy->prev->value;
+}
+
+template<typename T>
+bool List<T>::const_iterator::operator!=(const List::const_iterator& other) const {
+    return m_node != other.m_node;
+}
+
+template<typename T>
+typename List<T>::const_iterator& List<T>::const_iterator::operator++() {
+    m_node = m_node->next;
+    return *this;
+}
+
+template<typename T>
+const T& List<T>::const_iterator::operator*() const {
+    return m_node->value;
+}
+
+template<typename T>
+typename List<T>::const_iterator List<T>::begin() const {
+    return const_iterator(m_first_dummy->next);
+}
+
+template<typename T>
+typename List<T>::const_iterator List<T>::end() const {
+    return const_iterator(m_last_dummy);
 }
 
 template<typename T>
