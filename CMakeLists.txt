@@ -6,12 +6,10 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CUTIE_DIR Cutie)
 include(${CUTIE_DIR}/Cutie.cmake)
-add_cutie_tests_target(
-        test/test_list.cpp
-        test/test_stack.cpp
-        test/test_queue.cpp
-        test/test_graph.cpp
-        inc/list.hpp
-        inc/stack.hpp
-        inc/queue.hpp
-        inc/graph.hpp)
+add_cutie_test_target(TEST test/test_list.cpp SOURCES inc/list.hpp)
+add_cutie_test_target(TEST test/test_stack.cpp SOURCES inc/stack.hpp)
+add_cutie_test_target(TEST test/test_queue.cpp SOURCES inc/queue.hpp)
+add_cutie_test_target(TEST test/test_graph.cpp SOURCES inc/graph.hpp)
+add_cutie_test_target(TEST test/test_tree.cpp SOURCES inc/tree.hpp)
+add_cutie_all_tests_target()
+add_cutie_coverage_targets()
