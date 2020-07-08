@@ -18,6 +18,8 @@ public:
 
     static NodePtr create(const T&);
     static void do_preorder(const NodePtr& root, const std::function<void(const T&)>&);
+    static void do_postorder(const NodePtr& root, const std::function<void(const T&)>&);
+    static void do_inorder(const NodePtr& root, const std::function<void(const T&)>&);
 
 public:
     Tree() = delete;
@@ -83,6 +85,26 @@ void Tree<T>::do_preorder(const NodePtr& root, const std::function<void(const T&
         queue.enqueue(node->m_left);
         queue.enqueue(node->m_right);
     }
+}
+
+template<typename T>
+void Tree<T>::do_postorder(const Tree::NodePtr& root, const std::function<void(const T&)>& function) {
+    if (root == nullptr) {
+        return;
+    }
+    do_postorder(root->m_left, function);
+    do_postorder(root->m_right, function);
+    function(root->value);
+}
+
+template<typename T>
+void Tree<T>::do_inorder(const Tree::NodePtr& root, const std::function<void(const T&)>& function) {
+    if (root == nullptr) {
+        return;
+    }
+    do_postorder(root->m_left, function);
+    function(root->value);
+    do_postorder(root->m_right, function);
 }
 
 #endif //DATASTRUCTURES_ALGORITHMS_TREE_HPP

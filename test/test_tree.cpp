@@ -29,3 +29,15 @@ TEST_F(TreeTest, PreOrder) {
     Tree<int>::do_preorder(tree, [&](const int& item) { items.push_back(item); });
     EXPECT_EQ(items, List<int>({10, 5, 9, 2, 7, 1}));
 }
+
+TEST_F(TreeTest, PostOrder) {
+    List<int> items;
+    Tree<int>::do_postorder(tree, [&](const int& item) { items.push_back(item); });
+    EXPECT_EQ(items, List<int>({9, 2, 5, 1, 7, 10}));
+}
+
+TEST_F(TreeTest, InOrder) {
+    List<int> items;
+    Tree<int>::do_postorder(tree, [&](const int& item) { items.push_back(item); });
+    EXPECT_EQ(items, List<int>({9, 5, 2, 10, 7, 1}));
+}
