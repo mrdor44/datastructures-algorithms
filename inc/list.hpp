@@ -20,8 +20,8 @@ public:
     void push_front(const T&);
     void pop_front();
     void push_back(const T&);
-    template<typename Iterable>
-    void push_back(const Iterable&);
+    template<typename Iterator>
+    void push_back(const Iterator& start, const Iterator& end);
     void pop_back();
 
     void insert(int index, const T&);
@@ -107,7 +107,7 @@ List<T>::List() :
 
 template<typename T>
 List<T>::List(const std::initializer_list<T>& list) : List() {
-    push_back(list);
+    push_back(list.begin(), list.end());
 }
 
 template<typename T>
@@ -134,10 +134,10 @@ void List<T>::push_back(const T& value) {
 }
 
 template<typename T>
-template<typename Iterable>
-void List<T>::push_back(const Iterable& iterable) {
-    for (const T& e : iterable) {
-        push_back(e);
+template<typename Iterator>
+void List<T>::push_back(const Iterator& start, const Iterator& end) {
+    for (Iterator i = start; i != end; ++i) {
+        push_back(*i);
     }
 }
 

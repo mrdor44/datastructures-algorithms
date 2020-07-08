@@ -14,8 +14,8 @@ public:
     virtual ~Queue() = default;
 
     void enqueue(const T&);
-    template<typename Iterable>
-    void enqueue(const Iterable&);
+    template<typename Iterator>
+    void enqueue(const Iterator& start, const Iterator& end);
     void dequeue();
     const T& next() const;
     [[nodiscard]] bool is_empty() const;
@@ -30,9 +30,9 @@ void Queue<T>::enqueue(const T& value) {
 }
 
 template<typename T>
-template<typename Iterable>
-void Queue<T>::enqueue(const Iterable& iterable) {
-    m_list.push_back(iterable);
+template<typename Iterator>
+void Queue<T>::enqueue(const Iterator& start, const Iterator& end) {
+    m_list.push_back(start, end);
 }
 
 template<typename T>

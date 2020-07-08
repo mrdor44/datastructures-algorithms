@@ -12,18 +12,16 @@
 template<typename T>
 class Tree {
 public:
-    explicit Tree(const T&);
-    virtual ~Tree() = default;
-
     class Node;
 
     using NodePtr = std::shared_ptr<Node>;
 
-    const NodePtr& root() const;
-    void do_preorder(const std::function<void(const T&)>&) const;
+    static NodePtr create(const T&);
+    static void do_preorder(const NodePtr& root, const std::function<void(const T&)>&);
 
-private:
-    NodePtr m_root;
+public:
+    Tree() = delete;
+    ~Tree() = delete;
 };
 
 template<typename T>
@@ -48,15 +46,12 @@ private:
 };
 
 template<typename T>
-Tree<T>::Tree(const T& value) : m_root(Node::create(value)) {}
+typename Tree<T>::NodePtr Tree<T>::create(const T& value) {
+    return Node::create(value);
+}
 
 template<typename T>
 Tree<T>::Node::Node(const T& value) : value(value), m_left(), m_right() {}
-
-template<typename T>
-const typename Tree<T>::NodePtr& Tree<T>::root() const {
-    return m_root;
-}
 
 template<typename T>
 typename Tree<T>::NodePtr Tree<T>::Node::create(const T& value) {
@@ -76,10 +71,10 @@ const typename Tree<T>::NodePtr& Tree<T>::Node::set_right(const T& child_value) 
 }
 
 template<typename T>
-void Tree<T>::do_preorder(const std::function<void(const T&)>& function) const {
+void Tree<T>::do_preorder(const NodePtr& root, const std::function<void(const T&)>& function) {
     Queue<NodePtr> queue;
 
-    for (queue.enqueue(root()); !queue.is_empty(); queue.dequeue()) {
+    for (queue.enqueue(root); !queue.is_empty(); queue.dequeue()) {
         const NodePtr& node = queue.next();
         if (node == nullptr) {
             continue;
