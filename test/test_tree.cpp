@@ -17,12 +17,5 @@ TEST(Tree, PreOrder) {
     List<int> items;
     tree.do_preorder([&](const int& item) { items.push_back(item); });
 
-    // TODO: Convert to initializer list
-    List<int> expected_items;
-    expected_items.push_back(10);
-    expected_items.push_back(5);
-    expected_items.push_back(6);
-    expected_items.push_back(7);
-    expected_items.push_back(9);
-    EXPECT_EQ(items, expected_items);
+    EXPECT_EQ(items, List<int>({10, 5, 6, 7, 9}));
 }

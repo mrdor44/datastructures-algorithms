@@ -8,16 +8,20 @@
 #include <memory>
 #include <stdexcept>
 #include <sstream>
+#include <initializer_list>
 
 template<typename T>
 class List {
 public:
     List();
+    List(const std::initializer_list<T>&);
     virtual ~List();
 
     void push_front(const T&);
     void pop_front();
     void push_back(const T&);
+    template<typename Iterable>
+    void push_back(const Iterable&);
     void pop_back();
 
     void insert(int index, const T&);
@@ -65,7 +69,7 @@ public:
 private:
     NodePtr m_first_dummy;
     NodePtr m_last_dummy;
-    int m_length;
+    int m_length{};
 
 private:
     NodePtr get_node(int) const;
@@ -102,6 +106,11 @@ List<T>::List() :
 }
 
 template<typename T>
+List<T>::List(const std::initializer_list<T>& list) : List() {
+    push_back(list);
+}
+
+template<typename T>
 List<T>::~List() {
     clear();
 }
@@ -122,6 +131,14 @@ void List<T>::pop_front() {
 template<typename T>
 void List<T>::push_back(const T& value) {
     insert_before(m_last_dummy, value);
+}
+
+template<typename T>
+template<typename Iterable>
+void List<T>::push_back(const Iterable& iterable) {
+    for (const T& e : iterable) {
+        push_back(e);
+    }
 }
 
 template<typename T>
