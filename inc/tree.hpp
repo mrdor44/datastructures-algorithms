@@ -30,8 +30,8 @@ template<typename T>
 class Tree<T>::Node {
 public:
     virtual ~Node() = default;
-    NodePtr set_left(const T&);
-    NodePtr set_right(const T&);
+    const NodePtr& set_left(const T&);
+    const NodePtr& set_right(const T&);
 
 private:
     friend class Tree<T>;
@@ -64,13 +64,13 @@ typename Tree<T>::NodePtr Tree<T>::Node::create(const T& value) {
 }
 
 template<typename T>
-typename Tree<T>::NodePtr Tree<T>::Node::set_left(const T& child_value) {
+const typename Tree<T>::NodePtr& Tree<T>::Node::set_left(const T& child_value) {
     m_left = create(child_value);
     return m_left;
 }
 
 template<typename T>
-typename Tree<T>::NodePtr Tree<T>::Node::set_right(const T& child_value) {
+const typename Tree<T>::NodePtr& Tree<T>::Node::set_right(const T& child_value) {
     m_right = create(child_value);
     return m_right;
 }
@@ -78,14 +78,15 @@ typename Tree<T>::NodePtr Tree<T>::Node::set_right(const T& child_value) {
 template<typename T>
 void Tree<T>::do_preorder(const std::function<void(const T&)>& function) const {
     Queue<NodePtr> queue;
-    queue.enqueue(root());
 
-    while (!queue.is_empty()) {
+    for (queue.enqueue(root()); !queue.is_empty(); queue.dequeue()) {
         const NodePtr& node = queue.next();
+        if (node == nullptr) {
+            continue;
+        }
         function(node->value);
         queue.enqueue(node->m_left);
         queue.enqueue(node->m_right);
-        queue.dequeue();
     }
 }
 
