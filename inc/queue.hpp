@@ -32,9 +32,7 @@ void Queue<T>::enqueue(const T& value) {
 template<typename T>
 template<typename Iterable>
 void Queue<T>::enqueue(const Iterable& iterable) {
-    for (const T& e : iterable) {
-        enqueue(e);
-    }
+    m_list.push_back(iterable);
 }
 
 template<typename T>
