@@ -18,7 +18,7 @@ public:
     void enqueue(const Iterable&);
     void dequeue();
     const T& next() const;
-    bool is_empty() const;
+    [[nodiscard]] bool is_empty() const;
 
 private:
     List<T> m_list;
