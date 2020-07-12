@@ -26,7 +26,7 @@ protected:
 
 TEST_F(TreeTest, PreOrder) {
     List<int> items;
-    Tree<int>::do_preorder(tree, [&](const int& item) { items.push_back(item); });
+    Tree<int>::preorder(tree).apply([&](const int& item) { items.push_back(item); });
     EXPECT_EQ(items, List<int>({10, 5, 9, 2, 7, 1}));
 }
 

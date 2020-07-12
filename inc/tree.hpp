@@ -15,11 +15,13 @@ class Tree {
 public:
     class Node;
 
+    class PreorderScanner;
+
     using NodePtr = std::shared_ptr<Node>;
 
     static NodePtr create(const T&);
     static void do_bfs(const NodePtr& root, const std::function<void(const T&)>&);
-    static void do_preorder(const NodePtr& root, const std::function<void(const T&)>&);
+    static PreorderScanner preorder(const NodePtr& root);
     static void do_postorder(const NodePtr& root, const std::function<void(const T&)>&);
     static void do_inorder(const NodePtr& root, const std::function<void(const T&)>&);
 
@@ -50,12 +52,26 @@ private:
 };
 
 template<typename T>
+class Tree<T>::PreorderScanner {
+public:
+    PreorderScanner(const NodePtr&);
+
+    void apply(const std::function<void(const T&)>&) const;
+
+private:
+    const NodePtr& m_root;
+};
+
+template<typename T>
 typename Tree<T>::NodePtr Tree<T>::create(const T& value) {
     return Node::create(value);
 }
 
 template<typename T>
 Tree<T>::Node::Node(const T& value) : value(value), m_left(), m_right() {}
+
+template<typename T>
+Tree<T>::PreorderScanner::PreorderScanner(const NodePtr& root) : m_root(root) {}
 
 template<typename T>
 typename Tree<T>::NodePtr Tree<T>::Node::create(const T& value) {
@@ -90,13 +106,18 @@ void Tree<T>::do_bfs(const NodePtr& root, const std::function<void(const T&)>& f
 }
 
 template<typename T>
-void Tree<T>::do_preorder(const Tree::NodePtr& root, const std::function<void(const T&)>& function) {
-    if (root == nullptr) {
+typename Tree<T>::PreorderScanner Tree<T>::preorder(const NodePtr& root) {
+    return PreorderScanner(root);
+}
+
+template<typename T>
+void Tree<T>::PreorderScanner::apply(const std::function<void(const T&)>& function) const {
+    if (m_root == nullptr) {
         return;
     }
-    function(root->value);
-    do_preorder(root->m_left, function);
-    do_preorder(root->m_right, function);
+    function(m_root->value);
+    preorder(m_root->m_left).apply(function);
+    preorder(m_root->m_right).apply(function);
 }
 
 template<typename T>
