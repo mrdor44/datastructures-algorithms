@@ -38,6 +38,12 @@ TEST_F(TreeTest, PostOrder) {
 
 TEST_F(TreeTest, InOrder) {
     List<int> items;
-    Tree<int>::do_postorder(tree, [&](const int& item) { items.push_back(item); });
+    Tree<int>::do_inorder(tree, [&](const int& item) { items.push_back(item); });
     EXPECT_EQ(items, List<int>({9, 5, 2, 10, 7, 1}));
+}
+
+TEST_F(TreeTest, BFS) {
+    List<int> items;
+    Tree<int>::do_bfs(tree, [&](const int& item) { items.push_back(item); });
+    EXPECT_EQ(items, List<int>({10, 5, 7, 9, 2, 1}));
 }
