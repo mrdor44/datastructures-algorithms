@@ -165,12 +165,18 @@ typename Tree<T>::BFSScanner Tree<T>::bfs(const Tree::NodePtr& root) {
 
 template<typename T>
 void Tree<T>::PreorderScanner::apply(const std::function<void(const T&)>& function) const {
-    if (this->m_root == nullptr) {
-        return;
+    Stack<NodePtr> to_visit;
+
+    for (to_visit.push(this->m_root); !to_visit.is_empty();) {
+        const NodePtr node = to_visit.top();
+        to_visit.pop();
+        if (node == nullptr) {
+            continue;
+        }
+        function(node->value);
+        to_visit.push(node->m_right);
+        to_visit.push(node->m_left);
     }
-    function(this->m_root->value);
-    preorder(this->m_root->m_left).apply(function);
-    preorder(this->m_root->m_right).apply(function);
 }
 
 template<typename T>

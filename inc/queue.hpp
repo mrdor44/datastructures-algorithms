@@ -2,8 +2,8 @@
 // Created by dor on 02/07/2020.
 //
 
-#ifndef DATASTRUCTURES_ALGORITHMS_STACK_HPP
-#define DATASTRUCTURES_ALGORITHMS_STACK_HPP
+#ifndef DATASTRUCTURES_ALGORITHMS_QUEUE_HPP
+#define DATASTRUCTURES_ALGORITHMS_QUEUE_HPP
 
 #include "list.hpp"
 
@@ -50,4 +50,4 @@ bool Queue<T>::is_empty() const {
     return m_list.is_empty();
 }
 
-#endif //DATASTRUCTURES_ALGORITHMS_STACK_HPP
+#endif //DATASTRUCTURES_ALGORITHMS_QUEUE_HPP

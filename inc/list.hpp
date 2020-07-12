@@ -71,6 +71,9 @@ public:
 
         Node() = default;
         Node(const T& value, const NodePtr& next, const NodePtr& prev);
+
+        Node(const Node&) = delete;
+        Node& operator=(const Node&) = delete;
     };
 
 private:

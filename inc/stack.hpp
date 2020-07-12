@@ -16,6 +16,7 @@ public:
     void push(const T&);
     void pop();
     const T& top() const;
+    [[nodiscard]] bool is_empty() const;
 
 private:
     List<T> m_list;
@@ -34,6 +35,11 @@ void Stack<T>::pop() {
 template<typename T>
 const T& Stack<T>::top() const {
     return m_list.front();
+}
+
+template<typename T>
+bool Stack<T>::is_empty() const {
+    return m_list.is_empty();
 }
 
 #endif //DATASTRUCTURES_ALGORITHMS_STACK_HPP
