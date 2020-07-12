@@ -56,10 +56,12 @@ private:
 template<typename T>
 class Tree<T>::Scanner {
 public:
-    Scanner(const NodePtr&);
+    explicit Scanner(const NodePtr&);
     virtual ~Scanner() = default;
 
     virtual void apply(const std::function<void(const T&)>&) const = 0;
+    template<typename Container>
+    Container collect();
 
 protected:
     const NodePtr& m_root;
@@ -68,7 +70,7 @@ protected:
 template<typename T>
 class Tree<T>::PreorderScanner : public Tree<T>::Scanner {
 public:
-    PreorderScanner(const NodePtr&);
+    explicit PreorderScanner(const NodePtr&);
     virtual ~PreorderScanner() = default;
 
     virtual void apply(const std::function<void(const T&)>&) const;
@@ -153,6 +155,14 @@ void Tree<T>::do_inorder(const Tree::NodePtr& root, const std::function<void(con
     do_inorder(root->m_left, function);
     function(root->value);
     do_inorder(root->m_right, function);
+}
+
+template<typename T>
+template<typename Container>
+Container Tree<T>::Scanner::collect() {
+    Container container;
+    apply([&](const T& item) { container.push_back(item); });
+    return container;
 }
 
 #endif //DATASTRUCTURES_ALGORITHMS_TREE_HPP
