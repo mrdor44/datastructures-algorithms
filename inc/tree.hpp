@@ -15,6 +15,8 @@ class Tree {
 public:
     class Node;
 
+    class Scanner;
+
     class PreorderScanner;
 
     using NodePtr = std::shared_ptr<Node>;
@@ -52,14 +54,24 @@ private:
 };
 
 template<typename T>
-class Tree<T>::PreorderScanner {
+class Tree<T>::Scanner {
+public:
+    Scanner(const NodePtr&);
+    virtual ~Scanner() = default;
+
+    virtual void apply(const std::function<void(const T&)>&) const = 0;
+
+protected:
+    const NodePtr& m_root;
+};
+
+template<typename T>
+class Tree<T>::PreorderScanner : public Tree<T>::Scanner {
 public:
     PreorderScanner(const NodePtr&);
+    virtual ~PreorderScanner() = default;
 
-    void apply(const std::function<void(const T&)>&) const;
-
-private:
-    const NodePtr& m_root;
+    virtual void apply(const std::function<void(const T&)>&) const;
 };
 
 template<typename T>
@@ -71,7 +83,10 @@ template<typename T>
 Tree<T>::Node::Node(const T& value) : value(value), m_left(), m_right() {}
 
 template<typename T>
-Tree<T>::PreorderScanner::PreorderScanner(const NodePtr& root) : m_root(root) {}
+Tree<T>::Scanner::Scanner(const NodePtr& root) : m_root(root) {}
+
+template<typename T>
+Tree<T>::PreorderScanner::PreorderScanner(const NodePtr& root) : Scanner(root) {}
 
 template<typename T>
 typename Tree<T>::NodePtr Tree<T>::Node::create(const T& value) {
@@ -112,12 +127,12 @@ typename Tree<T>::PreorderScanner Tree<T>::preorder(const NodePtr& root) {
 
 template<typename T>
 void Tree<T>::PreorderScanner::apply(const std::function<void(const T&)>& function) const {
-    if (m_root == nullptr) {
+    if (this->m_root == nullptr) {
         return;
     }
-    function(m_root->value);
-    preorder(m_root->m_left).apply(function);
-    preorder(m_root->m_right).apply(function);
+    function(this->m_root->value);
+    preorder(this->m_root->m_left).apply(function);
+    preorder(this->m_root->m_right).apply(function);
 }
 
 template<typename T>
