@@ -14,18 +14,18 @@ template<typename T>
 class Tree {
 public:
     class Node;
-
-    class Scanner;
-
-    class PreorderScanner;
-
     using NodePtr = std::shared_ptr<Node>;
+    class Scanner;
+    class PreorderScanner;
+    class PostorderScanner;
+    class InorderScanner;
+    class BFSScanner;
 
     static NodePtr create(const T&);
-    static void do_bfs(const NodePtr& root, const std::function<void(const T&)>&);
     static PreorderScanner preorder(const NodePtr& root);
-    static void do_postorder(const NodePtr& root, const std::function<void(const T&)>&);
-    static void do_inorder(const NodePtr& root, const std::function<void(const T&)>&);
+    static PostorderScanner postorder(const NodePtr& root);
+    static InorderScanner inorder(const NodePtr& root);
+    static BFSScanner bfs(const NodePtr& root);
 
 public:
     Tree() = delete;
@@ -73,7 +73,34 @@ public:
     explicit PreorderScanner(const NodePtr&);
     virtual ~PreorderScanner() = default;
 
-    virtual void apply(const std::function<void(const T&)>&) const;
+    void apply(const std::function<void(const T&)>&) const override;
+};
+
+template<typename T>
+class Tree<T>::PostorderScanner : public Tree<T>::Scanner {
+public:
+    explicit PostorderScanner(const NodePtr&);
+    virtual ~PostorderScanner() = default;
+
+    void apply(const std::function<void(const T&)>& function) const override;
+};
+
+template<typename T>
+class Tree<T>::InorderScanner : public Tree<T>::Scanner {
+public:
+    explicit InorderScanner(const NodePtr&);
+    virtual ~InorderScanner() = default;
+
+    void apply(const std::function<void(const T&)>& function) const override;
+};
+
+template<typename T>
+class Tree<T>::BFSScanner : public Tree<T>::Scanner {
+public:
+    explicit BFSScanner(const NodePtr&);
+    virtual ~BFSScanner() = default;
+
+    void apply(const std::function<void(const T&)>& function) const override;
 };
 
 template<typename T>
@@ -89,6 +116,15 @@ Tree<T>::Scanner::Scanner(const NodePtr& root) : m_root(root) {}
 
 template<typename T>
 Tree<T>::PreorderScanner::PreorderScanner(const NodePtr& root) : Scanner(root) {}
+
+template<typename T>
+Tree<T>::PostorderScanner::PostorderScanner(const NodePtr& root) : Scanner(root) {}
+
+template<typename T>
+Tree<T>::InorderScanner::InorderScanner(const NodePtr& root) : Scanner(root) {}
+
+template<typename T>
+Tree<T>::BFSScanner::BFSScanner(const NodePtr& root) : Scanner(root) {}
 
 template<typename T>
 typename Tree<T>::NodePtr Tree<T>::Node::create(const T& value) {
@@ -108,23 +144,23 @@ const typename Tree<T>::NodePtr& Tree<T>::Node::set_right(const T& child_value) 
 }
 
 template<typename T>
-void Tree<T>::do_bfs(const NodePtr& root, const std::function<void(const T&)>& function) {
-    Queue<NodePtr> queue;
-
-    for (queue.enqueue(root); !queue.is_empty(); queue.dequeue()) {
-        const NodePtr& node = queue.next();
-        if (node == nullptr) {
-            continue;
-        }
-        function(node->value);
-        queue.enqueue(node->m_left);
-        queue.enqueue(node->m_right);
-    }
+typename Tree<T>::PreorderScanner Tree<T>::preorder(const NodePtr& root) {
+    return PreorderScanner(root);
 }
 
 template<typename T>
-typename Tree<T>::PreorderScanner Tree<T>::preorder(const NodePtr& root) {
-    return PreorderScanner(root);
+typename Tree<T>::PostorderScanner Tree<T>::postorder(const Tree::NodePtr& root) {
+    return PostorderScanner(root);
+}
+
+template<typename T>
+typename Tree<T>::InorderScanner Tree<T>::inorder(const Tree::NodePtr& root) {
+    return InorderScanner(root);
+}
+
+template<typename T>
+typename Tree<T>::BFSScanner Tree<T>::bfs(const Tree::NodePtr& root) {
+    return BFSScanner(root);
 }
 
 template<typename T>
@@ -138,23 +174,38 @@ void Tree<T>::PreorderScanner::apply(const std::function<void(const T&)>& functi
 }
 
 template<typename T>
-void Tree<T>::do_postorder(const Tree::NodePtr& root, const std::function<void(const T&)>& function) {
-    if (root == nullptr) {
+void Tree<T>::PostorderScanner::apply(const std::function<void(const T&)>& function) const {
+    if (this->m_root == nullptr) {
         return;
     }
-    do_postorder(root->m_left, function);
-    do_postorder(root->m_right, function);
-    function(root->value);
+    postorder(this->m_root->m_left).apply(function);
+    postorder(this->m_root->m_right).apply(function);
+    function(this->m_root->value);
 }
 
 template<typename T>
-void Tree<T>::do_inorder(const Tree::NodePtr& root, const std::function<void(const T&)>& function) {
-    if (root == nullptr) {
+void Tree<T>::InorderScanner::apply(const std::function<void(const T&)>& function) const {
+    if (this->m_root == nullptr) {
         return;
     }
-    do_inorder(root->m_left, function);
-    function(root->value);
-    do_inorder(root->m_right, function);
+    inorder(this->m_root->m_left).apply(function);
+    function(this->m_root->value);
+    inorder(this->m_root->m_right).apply(function);
+}
+
+template<typename T>
+void Tree<T>::BFSScanner::apply(const std::function<void(const T&)>& function) const {
+    Queue<NodePtr> queue;
+
+    for (queue.enqueue(this->m_root); !queue.is_empty(); queue.dequeue()) {
+        const NodePtr& node = queue.next();
+        if (node == nullptr) {
+            continue;
+        }
+        function(node->value);
+        queue.enqueue(node->m_left);
+        queue.enqueue(node->m_right);
+    }
 }
 
 template<typename T>

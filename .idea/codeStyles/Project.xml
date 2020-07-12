@@ -1,5 +1,6 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <option name="FORMATTER_TAGS_ENABLED" value="true" />
     <Objective-C>
       <option name="INDENT_NAMESPACE_MEMBERS" value="0" />
       <option name="SPACE_BEFORE_POINTER_IN_DECLARATION" value="false" />
@@ -14,6 +15,7 @@
       </extensions>
     </Objective-C-extensions>
     <codeStyleSettings language="ObjectiveC">
+      <option name="BLANK_LINES_AROUND_CLASS" value="0" />
       <option name="BLANK_LINES_AROUND_METHOD_IN_INTERFACE" value="0" />
     </codeStyleSettings>
   </code_scheme>

@@ -30,19 +30,16 @@ TEST_F(TreeTest, PreOrder) {
 }
 
 TEST_F(TreeTest, PostOrder) {
-    List<int> items;
-    Tree<int>::do_postorder(tree, [&](const int& item) { items.push_back(item); });
+    auto items = Tree<int>::postorder(tree).collect<List<int>>();
     EXPECT_EQ(items, List<int>({9, 2, 5, 1, 7, 10}));
 }
 
 TEST_F(TreeTest, InOrder) {
-    List<int> items;
-    Tree<int>::do_inorder(tree, [&](const int& item) { items.push_back(item); });
+    auto items = Tree<int>::inorder(tree).collect<List<int>>();
     EXPECT_EQ(items, List<int>({9, 5, 2, 10, 7, 1}));
 }
 
 TEST_F(TreeTest, BFS) {
-    List<int> items;
-    Tree<int>::do_bfs(tree, [&](const int& item) { items.push_back(item); });
+    auto items = Tree<int>::bfs(tree).collect<List<int>>();
     EXPECT_EQ(items, List<int>({10, 5, 7, 9, 2, 1}));
 }
