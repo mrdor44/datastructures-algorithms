@@ -40,3 +40,34 @@ TEST(List, PushPopBack) {
     EXPECT_EQ(0, list[0]);
     EXPECT_EQ(1, list.length());
 }
+
+TEST(List, Move) {
+    List<int> list1({1, 2, 3, 4});
+    List<int> list2(std::move(list1));
+    EXPECT_EQ(list2, List<int>({1, 2, 3, 4}));
+}
+
+TEST(List, Copy) {
+    List<int> list1({1, 2, 3, 4});
+    List<int> list2(list1);
+    EXPECT_EQ(list1, List<int>({1, 2, 3, 4}));
+    EXPECT_EQ(list2, List<int>({1, 2, 3, 4}));
+}
+
+TEST(List, Equal) {
+    List<int> list1({1, 2, 3, 4});
+    List<int> list2;
+    list2.push_back(1);
+    list2.push_back(2);
+    list2.push_back(3);
+    list2.push_back(4);
+    EXPECT_EQ(list1, list2);
+}
+
+TEST(List, Unequal) {
+    EXPECT_NE(List<int>({4, 3, 2, 1}), List<int>({4, 3, 2, 1, 0}));
+    EXPECT_NE(List<int>({4, 3, 2, 1}), List<int>({1, 2, 3, 4}));
+    EXPECT_NE(List<int>({4, 3, 2, 1}), List<int>({4, 3, 2, 0}));
+    EXPECT_NE(List<int>({4, 3, 2, 1}), List<int>({4, 3, 2}));
+    EXPECT_NE(List<int>({4, 3, 2, 1}), List<int>());
+}

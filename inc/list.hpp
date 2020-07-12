@@ -9,13 +9,17 @@
 #include <stdexcept>
 #include <sstream>
 #include <initializer_list>
+#include <cassert>
 
 template<typename T>
 class List {
 public:
     List();
     List(const std::initializer_list<T>&);
+    List(const List&);
+    List(List&&);
     virtual ~List();
+    List& operator=(const List&) = delete;
 
     void push_front(const T&);
     void pop_front();
@@ -33,6 +37,9 @@ public:
     const T& operator[](int) const;
     const T& front() const;
     const T& back() const;
+
+    template<typename S>
+    friend void swap(List<S>&, List<S>&) noexcept;
 
     struct Node;
     using NodePtr = std::shared_ptr<Node>;
@@ -69,7 +76,7 @@ public:
 private:
     NodePtr m_first_dummy;
     NodePtr m_last_dummy;
-    int m_length{};
+    int m_length;
 
 private:
     NodePtr get_node(int) const;
@@ -78,18 +85,27 @@ private:
 };
 
 template<typename T>
+void swap(List<T>& list1, List<T>& list2) noexcept;
+
+template<typename T>
 bool operator==(const List<T>& list1, const List<T>& list2) {
     if (list1.length() != list2.length()) {
         return false;
     }
     auto e1 = list1.begin();
     auto e2 = list2.begin();
-    for (int i = 0; i < list1.length(); ++i) {
+    for (; e1 != list1.end(); ++e1, ++e2) {
+        assert(e2 != list2.end());
         if (*e1 != *e2) {
             return false;
         }
     }
     return true;
+}
+
+template<typename T>
+bool operator!=(const List<T>& list1, const List<T>& list2) {
+    return !(list1 == list2);
 }
 
 template<typename T>
@@ -108,6 +124,21 @@ List<T>::List() :
 template<typename T>
 List<T>::List(const std::initializer_list<T>& list) : List() {
     push_back(list.begin(), list.end());
+}
+
+
+template<typename T>
+List<T>::List(const List& other) : List() {
+    push_back(other.begin(), other.end());
+}
+
+
+template<typename T>
+List<T>::List(List&& other) :
+        m_first_dummy(std::move(other.m_first_dummy)),
+        m_last_dummy(std::move(other.m_last_dummy)),
+        m_length(std::move(other.m_length)) {
+            other.m_length = 0;
 }
 
 template<typename T>
@@ -196,6 +227,14 @@ const T& List<T>::front() const {
 template<typename T>
 const T& List<T>::back() const {
     return m_last_dummy->prev->value;
+}
+
+
+template<typename T>
+void swap(List<T>& list1, List<T>& list2) noexcept {
+    std::swap(list1.m_first_dummy, list2.m_first_dummy);
+    std::swap(list2.m_last_dummy, list2.m_last_dummy);
+    std::swap(list1.m_length, list2.m_length);
 }
 
 template<typename T>
