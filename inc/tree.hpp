@@ -191,12 +191,23 @@ void Tree<T>::PostorderScanner::apply(const std::function<void(const T&)>& funct
 
 template<typename T>
 void Tree<T>::InorderScanner::apply(const std::function<void(const T&)>& function) const {
-    if (this->m_root == nullptr) {
-        return;
+    Stack<NodePtr> to_visit;
+    NodePtr current = this->m_root;
+
+    while (current != nullptr or not to_visit.is_empty()) {
+        while (current != nullptr) {
+            to_visit.push(current);
+            current = current->m_left;
+        }
+
+        assert(current == nullptr);
+        if (not to_visit.is_empty()) {
+            current = to_visit.top();
+            to_visit.pop();
+            function(current->value);
+            current = current->m_right;
+        }
     }
-    inorder(this->m_root->m_left).apply(function);
-    function(this->m_root->value);
-    inorder(this->m_root->m_right).apply(function);
 }
 
 template<typename T>
