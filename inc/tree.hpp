@@ -181,24 +181,37 @@ void Tree<T>::PreorderScanner::apply(const std::function<void(const T&)>& functi
 
 template<typename T>
 void Tree<T>::PostorderScanner::apply(const std::function<void(const T&)>& function) const {
-    Stack<NodePtr> reverse_postorder;
-    Stack<NodePtr> postorder;
+    enum class NextVisit {
+        LEFT,
+        RIGHT,
+        SELF
+    };
 
-    for (reverse_postorder.push(this->m_root); not reverse_postorder.is_empty();) {
-        const NodePtr node = reverse_postorder.top();
-        reverse_postorder.pop();
+    Stack<std::pair<NodePtr, NextVisit>> to_visit;
+    to_visit.push(std::make_pair(this->m_root, NextVisit::LEFT));
+
+    while (not to_visit.is_empty()) {
+        const std::pair<NodePtr, NextVisit> node_visit = to_visit.top();
+        to_visit.pop();
+
+        const NodePtr& node = node_visit.first;
         if (node == nullptr) {
             continue;
         }
 
-        postorder.push(node);
-        reverse_postorder.push(node->m_left);
-        reverse_postorder.push(node->m_right);
-    }
-
-    for (; not postorder.is_empty(); postorder.pop()) {
-        const NodePtr node = postorder.top();
-        function(node->value);
+        switch (node_visit.second) {
+        case NextVisit::LEFT:
+            to_visit.push(std::make_pair(node, NextVisit::RIGHT));
+            to_visit.push(std::make_pair(node->m_left, NextVisit::LEFT));
+            break;
+        case NextVisit::RIGHT:
+            to_visit.push(std::make_pair(node, NextVisit::SELF));
+            to_visit.push(std::make_pair(node->m_right, NextVisit::LEFT));
+            break;
+        case NextVisit::SELF:
+            function(node->value);
+            break;
+        }
     }
 }
 

@@ -17,6 +17,7 @@
     <codeStyleSettings language="ObjectiveC">
       <option name="BLANK_LINES_AROUND_CLASS" value="0" />
       <option name="BLANK_LINES_AROUND_METHOD_IN_INTERFACE" value="0" />
+      <option name="INDENT_CASE_FROM_SWITCH" value="false" />
     </codeStyleSettings>
   </code_scheme>
 </component>
