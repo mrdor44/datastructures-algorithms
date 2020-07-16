@@ -181,12 +181,25 @@ void Tree<T>::PreorderScanner::apply(const std::function<void(const T&)>& functi
 
 template<typename T>
 void Tree<T>::PostorderScanner::apply(const std::function<void(const T&)>& function) const {
-    if (this->m_root == nullptr) {
-        return;
+    Stack<NodePtr> reverse_postorder;
+    Stack<NodePtr> postorder;
+
+    for (reverse_postorder.push(this->m_root); not reverse_postorder.is_empty();) {
+        const NodePtr node = reverse_postorder.top();
+        reverse_postorder.pop();
+        if (node == nullptr) {
+            continue;
+        }
+
+        postorder.push(node);
+        reverse_postorder.push(node->m_left);
+        reverse_postorder.push(node->m_right);
     }
-    postorder(this->m_root->m_left).apply(function);
-    postorder(this->m_root->m_right).apply(function);
-    function(this->m_root->value);
+
+    for (; not postorder.is_empty(); postorder.pop()) {
+        const NodePtr node = postorder.top();
+        function(node->value);
+    }
 }
 
 template<typename T>
