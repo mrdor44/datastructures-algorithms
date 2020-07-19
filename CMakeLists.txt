@@ -11,6 +11,7 @@ set(
         inc/queue.hpp
         inc/graph.hpp
         inc/tree.hpp
+        inc/graph_scanner.hpp
 )
 
 set(CUTIE_DIR Cutie)

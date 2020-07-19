@@ -9,6 +9,7 @@
 #include <functional>
 #include "queue.hpp"
 #include "stack.hpp"
+#include "graph_scanner.hpp"
 
 template<typename T>
 class Tree {
@@ -54,14 +55,10 @@ private:
 };
 
 template<typename T>
-class Tree<T>::Scanner {
+class Tree<T>::Scanner : public GraphScanner<T> {
 public:
     explicit Scanner(const NodePtr&);
     virtual ~Scanner() = default;
-
-    virtual void apply(const std::function<void(const T&)>&) const = 0;
-    template<typename Container>
-    Container collect();
 
 protected:
     const NodePtr& m_root;
@@ -249,14 +246,6 @@ void Tree<T>::BFSScanner::apply(const std::function<void(const T&)>& function) c
         queue.enqueue(node->m_left);
         queue.enqueue(node->m_right);
     }
-}
-
-template<typename T>
-template<typename Container>
-Container Tree<T>::Scanner::collect() {
-    Container container;
-    apply([&](const T& item) { container.push_back(item); });
-    return container;
 }
 
 #endif //DATASTRUCTURES_ALGORITHMS_TREE_HPP
