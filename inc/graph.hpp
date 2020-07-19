@@ -15,6 +15,8 @@ class Graph {
 public:
     Graph() = default;
     virtual ~Graph() = default;
+    Graph(const Graph&) = delete;
+    Graph(Graph&&) = default;
 
     class Node;
     using NodePtr = std::shared_ptr<Node>;

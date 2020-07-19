@@ -10,6 +10,7 @@
 #include "queue.hpp"
 #include "stack.hpp"
 #include "graph_scanner.hpp"
+#include "graph.hpp"
 
 template<typename T>
 class Tree {
@@ -27,6 +28,7 @@ public:
     static PostorderScanner postorder(const NodePtr& root);
     static InorderScanner inorder(const NodePtr& root);
     static BFSScanner bfs(const NodePtr& root);
+    static Graph<T> to_graph(const NodePtr& root);
 
 public:
     Tree() = delete;
@@ -39,6 +41,7 @@ public:
     virtual ~Node() = default;
     const NodePtr& set_left(const T&);
     const NodePtr& set_right(const T&);
+    [[nodiscard]] int num_children() const;
 
 private:
     friend class Tree<T>;
@@ -71,6 +74,10 @@ public:
     virtual ~PreorderScanner() = default;
 
     void apply(const std::function<void(const T&)>&) const override;
+    friend class Tree<T>;
+
+private:
+    void apply(const std::function<void(const NodePtr&)>&) const;
 };
 
 template<typename T>
@@ -141,6 +148,18 @@ const typename Tree<T>::NodePtr& Tree<T>::Node::set_right(const T& child_value) 
 }
 
 template<typename T>
+int Tree<T>::Node::num_children() const {
+    int num_children = 0;
+    if (m_right != nullptr) {
+        ++num_children;
+    }
+    if (m_left != nullptr) {
+        ++num_children;
+    }
+    return num_children;
+}
+
+template<typename T>
 typename Tree<T>::PreorderScanner Tree<T>::preorder(const NodePtr& root) {
     return PreorderScanner(root);
 }
@@ -161,7 +180,39 @@ typename Tree<T>::BFSScanner Tree<T>::bfs(const Tree::NodePtr& root) {
 }
 
 template<typename T>
+Graph<T> Tree<T>::to_graph(const NodePtr& root) {
+    Graph<T> graph;
+    const typename Graph<T>::NodePtr& graph_root = graph.add_root(root->value);
+
+    Stack<std::pair<typename Graph<T>::NodePtr, int>> parents;
+    parents.push(std::make_pair(graph_root, root->num_children()));
+
+    std::function<void(const NodePtr&)> clone_node = [&](const NodePtr& node) {
+        const typename Graph<T>::NodePtr parent = parents.top().first;
+        int remaining_children = parents.top().second;
+        parents.pop();
+
+        const typename Graph<T>::NodePtr& graph_node = parent->add_neighbor(node->value);
+        --remaining_children;
+        if (remaining_children > 0) {
+            parents.push(std::make_pair(parent, remaining_children));
+        }
+        if (node->num_children() != 0) {
+            parents.push(std::make_pair(graph_node, node->num_children()));
+        }
+    };
+    preorder(root->m_left).apply(clone_node);
+    preorder(root->m_right).apply(clone_node);
+    return graph;
+}
+
+template<typename T>
 void Tree<T>::PreorderScanner::apply(const std::function<void(const T&)>& function) const {
+    apply([&](const NodePtr& node) { function(node->value); });
+}
+
+template<typename T>
+void Tree<T>::PreorderScanner::apply(const std::function<void(const Tree<T>::NodePtr&)>& function) const {
     Stack<NodePtr> to_visit;
 
     for (to_visit.push(this->m_root); !to_visit.is_empty();) {
@@ -170,7 +221,7 @@ void Tree<T>::PreorderScanner::apply(const std::function<void(const T&)>& functi
         if (node == nullptr) {
             continue;
         }
-        function(node->value);
+        function(node);
         to_visit.push(node->m_right);
         to_visit.push(node->m_left);
     }
@@ -235,17 +286,8 @@ void Tree<T>::InorderScanner::apply(const std::function<void(const T&)>& functio
 
 template<typename T>
 void Tree<T>::BFSScanner::apply(const std::function<void(const T&)>& function) const {
-    Queue<NodePtr> queue;
-
-    for (queue.enqueue(this->m_root); !queue.is_empty(); queue.dequeue()) {
-        const NodePtr& node = queue.next();
-        if (node == nullptr) {
-            continue;
-        }
-        function(node->value);
-        queue.enqueue(node->m_left);
-        queue.enqueue(node->m_right);
-    }
+    Graph<T> graph = to_graph(this->m_root);
+    graph.bfs().apply(function);
 }
 
 #endif //DATASTRUCTURES_ALGORITHMS_TREE_HPP
