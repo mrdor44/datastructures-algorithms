@@ -14,6 +14,8 @@ public:
     virtual ~Stack() = default;
 
     void push(const T&);
+    template<typename Iterator>
+    void push(const Iterator& start, const Iterator& end);
     void pop();
     const T& top() const;
     [[nodiscard]] bool is_empty() const;
@@ -25,6 +27,12 @@ private:
 template<typename T>
 void Stack<T>::push(const T& value) {
     m_list.push_front(value);
+}
+
+template<typename T>
+template<typename Iterator>
+void Stack<T>::push(const Iterator& start, const Iterator& end) {
+    m_list.push_front(start, end);
 }
 
 template<typename T>
