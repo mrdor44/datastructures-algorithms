@@ -16,17 +16,22 @@ class List {
 public:
     List();
     List(const std::initializer_list<T>&);
+    template<typename Iterator>
+    List(const Iterator& begin, const Iterator& end);
     List(const List&);
-    List(List&&);
+    List(List&&) noexcept;
     virtual ~List();
-    List& operator=(const List&) = delete;
+    List& operator=(List);
 
     void push_front(const T&);
     void pop_front();
+    template<typename Iterator>
+    void push_front(const Iterator& start, const Iterator& end);
     void push_back(const T&);
     template<typename Iterator>
     void push_back(const Iterator& start, const Iterator& end);
     void pop_back();
+    List& operator+=(const List&);
 
     void insert(int index, const T&);
     void erase(int index);
@@ -91,6 +96,9 @@ template<typename T>
 void swap(List<T>& list1, List<T>& list2) noexcept;
 
 template<typename T>
+inline List<T> operator+(List<T>, const List<T>&);
+
+template<typename T>
 bool operator==(const List<T>& list1, const List<T>& list2) {
     if (list1.length() != list2.length()) {
         return false;
@@ -125,23 +133,21 @@ List<T>::List() :
 }
 
 template<typename T>
-List<T>::List(const std::initializer_list<T>& list) : List() {
-    push_back(list.begin(), list.end());
+List<T>::List(const std::initializer_list<T>& list) : List(list.begin(), list.end()) {}
+
+template<typename T>
+template<typename Iterator>
+List<T>::List(const Iterator& begin, const Iterator& end) : List() {
+    push_back(begin, end);
 }
+
+template<typename T>
+List<T>::List(const List& other) : List(other.begin(), other.end()) {}
 
 
 template<typename T>
-List<T>::List(const List& other) : List() {
-    push_back(other.begin(), other.end());
-}
-
-
-template<typename T>
-List<T>::List(List&& other) :
-        m_first_dummy(std::move(other.m_first_dummy)),
-        m_last_dummy(std::move(other.m_last_dummy)),
-        m_length(std::move(other.m_length)) {
-            other.m_length = 0;
+List<T>::List(List&& other) noexcept : List() {
+    swap(*this, other);
 }
 
 template<typename T>
@@ -150,11 +156,24 @@ List<T>::~List() {
 }
 
 template<typename T>
+List<T>& List<T>::operator=(List<T> other) {
+    swap(*this, other);
+    return *this;
+}
+
+template<typename T>
 List<T>::const_iterator::const_iterator(const List::NodePtr& node) : m_node(node) {}
 
 template<typename T>
 void List<T>::push_front(const T& value) {
     insert(0, value);
+}
+
+template<typename T>
+template<typename Iterator>
+void List<T>::push_front(const Iterator& start, const Iterator& end) {
+    List<T> new_elements(start, end);
+    *this = new_elements + *this;
 }
 
 template<typename T>
@@ -178,6 +197,12 @@ void List<T>::push_back(const Iterator& start, const Iterator& end) {
 template<typename T>
 void List<T>::pop_back() {
     erase(m_last_dummy->prev);
+}
+
+template<typename T>
+List<T>& List<T>::operator+=(const List<T>& rhs) {
+    push_back(rhs.begin(), rhs.end());
+    return *this;
 }
 
 template<typename T>
@@ -232,12 +257,16 @@ const T& List<T>::back() const {
     return m_last_dummy->prev->value;
 }
 
-
 template<typename T>
 void swap(List<T>& list1, List<T>& list2) noexcept {
     std::swap(list1.m_first_dummy, list2.m_first_dummy);
-    std::swap(list2.m_last_dummy, list2.m_last_dummy);
+    std::swap(list1.m_last_dummy, list2.m_last_dummy);
     std::swap(list1.m_length, list2.m_length);
+}
+
+template<typename T>
+inline List<T> operator+(List<T> lhs, const List<T>& rhs) {
+    return lhs += rhs;
 }
 
 template<typename T>

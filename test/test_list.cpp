@@ -1,3 +1,4 @@
+#include <vector>
 #include "inc/list.hpp"
 #include "mock.hpp"
 
@@ -41,27 +42,39 @@ TEST(List, PushPopBack) {
     EXPECT_EQ(1, list.length());
 }
 
-TEST(List, Move) {
-    List<int> list1({1, 2, 3, 4});
-    List<int> list2(std::move(list1));
+class ListTest : public testing::Test {
+protected:
+    virtual void SetUp() {
+        list = List<int>({1, 2, 3, 4});
+    }
+
+protected:
+    List<int> list;
+};
+
+TEST_F(ListTest, Move) {
+    List<int> list2(std::move(list));
     EXPECT_EQ(list2, List<int>({1, 2, 3, 4}));
 }
 
-TEST(List, Copy) {
-    List<int> list1({1, 2, 3, 4});
-    List<int> list2(list1);
-    EXPECT_EQ(list1, List<int>({1, 2, 3, 4}));
+TEST_F(ListTest, Copy) {
+    List<int> list2(list);
+    EXPECT_EQ(list, List<int>({1, 2, 3, 4}));
     EXPECT_EQ(list2, List<int>({1, 2, 3, 4}));
 }
 
-TEST(List, Equal) {
-    List<int> list1({1, 2, 3, 4});
+TEST_F(ListTest, PushFrontRange) {
+    std::vector<int> v({0, 1, 2});
+    list.push_front(v.begin(), v.end());
+}
+
+TEST_F(ListTest, Equal) {
     List<int> list2;
     list2.push_back(1);
     list2.push_back(2);
     list2.push_back(3);
     list2.push_back(4);
-    EXPECT_EQ(list1, list2);
+    EXPECT_EQ(list, list2);
 }
 
 TEST(List, Unequal) {
