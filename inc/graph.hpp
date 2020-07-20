@@ -8,6 +8,7 @@
 #include <memory>
 #include "list.hpp"
 #include "queue.hpp"
+#include "stack.hpp"
 #include "graph_scanner.hpp"
 
 template<typename T>
@@ -22,10 +23,12 @@ public:
     using NodePtr = std::shared_ptr<Node>;
     class Scanner;
     class BFSScanner;
+    class DFSScanner;
 
     NodePtr add_root(const T&);
     const List<NodePtr>& roots() const;
     BFSScanner bfs() const;
+    DFSScanner dfs() const;
 
 private:
     List<NodePtr> m_roots;
@@ -78,6 +81,17 @@ public:
 };
 
 template<typename T>
+class Graph<T>::DFSScanner : public Graph<T>::Scanner {
+private:
+    explicit DFSScanner(const Graph&);
+    friend class Graph<T>;
+
+public:
+    virtual ~DFSScanner() = default;
+    void apply(const std::function<void(const T&)>& function) const override;
+};
+
+template<typename T>
 typename Graph<T>::NodePtr Graph<T>::add_root(const T& value) {
     m_roots.push_back(Node::create(value));
     return m_roots.back();
@@ -101,6 +115,9 @@ Graph<T>::Scanner::Scanner(const Graph& graph) : m_graph(graph) {}
 
 template<typename T>
 Graph<T>::BFSScanner::BFSScanner(const Graph& graph) : Scanner(graph) {}
+
+template<typename T>
+Graph<T>::DFSScanner::DFSScanner(const Graph& graph) : Scanner(graph) {}
 
 template<typename T>
 typename Graph<T>::NodePtr Graph<T>::Node::add_neighbor(const T& neighbor_value) {
@@ -139,6 +156,11 @@ typename Graph<T>::BFSScanner Graph<T>::bfs() const {
 }
 
 template<typename T>
+typename Graph<T>::DFSScanner Graph<T>::dfs() const {
+    return Graph::DFSScanner(*this);
+}
+
+template<typename T>
 void Graph<T>::BFSScanner::apply(const std::function<void(const T&)>& function) const {
     Queue<NodePtr> queue;
 
@@ -161,5 +183,31 @@ void Graph<T>::BFSScanner::apply(const std::function<void(const T&)>& function) 
         queue.enqueue(node->neighbors().begin(), node->neighbors().end());
     }
 }
+
+template<typename T>
+void Graph<T>::DFSScanner::apply(const std::function<void(const T&)>& function) const {
+    Stack<NodePtr> to_visit;
+
+    const List<NodePtr>& roots = this->m_graph.roots();
+    if (roots.is_empty()) {
+        return;
+    }
+
+    bool unvisited = roots[0]->is_visited();
+    bool visited = not unvisited;
+
+    for (to_visit.push(roots.begin(), roots.end()); !to_visit.is_empty();) {
+        const NodePtr node = to_visit.top();
+        to_visit.pop();
+        if (node == nullptr or node->is_visited() == visited) {
+            continue;
+        }
+        assert(node->is_visited() == unvisited);
+        function(node->value);
+        node->is_visited() = visited;
+        to_visit.push(node->neighbors().begin(), node->neighbors().end());
+    }
+}
+
 
 #endif //DATASTRUCTURES_ALGORITHMS_GRAPH_HPP
