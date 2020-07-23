@@ -1,10 +1,11 @@
 #include <vector>
+#include <array>
 #include "inc/binary_search.hpp"
 #include "mock.hpp"
 
 using testing::ValuesIn;
+using testing::Types;
 
-// TODO: Use Lists, std::array, classic array, strings
 template<typename T>
 class BinarySearchTests : public testing::Test {
 protected:
@@ -35,7 +36,7 @@ TYPED_TEST_P(BinarySearchTests, SearchNonExistingElement) {
 
 REGISTER_TYPED_TEST_SUITE_P(BinarySearchTests, SearchExistingValues, SearchNonExistingElement);
 
-using ContainerTypes = testing::Types<std::vector<int>>;
+using ContainerTypes = Types<std::vector<int>, std::array<int, 11>>;
 INSTANTIATE_TYPED_TEST_SUITE_P(, BinarySearchTests, ContainerTypes);
 
 TEST(BinarySearchTests, SearchInEmptyContainer) {
