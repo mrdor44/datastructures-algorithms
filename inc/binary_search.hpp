@@ -29,7 +29,9 @@ Iterator binary_search(Iterator begin, const Iterator& end, const T& value) {
         }
         assert(value > *middle);
         begin = middle;
+        std::advance(begin, 1);
         span -= span / 2;
+        span -= 1;
     }
     return begin;
 }

@@ -10,7 +10,7 @@ public:
     static const std::vector<int> CONTAINER;
 };
 
-const std::vector<int> BinarySearchTests::CONTAINER({2, 4, 6, 8, 10, 12, 14, 16, 18, 20});
+const std::vector<int> BinarySearchTests::CONTAINER({2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22});
 
 INSTANTIATE_TEST_SUITE_P(ExistingValues,
                          BinarySearchTests,
@@ -24,10 +24,15 @@ TEST_P(BinarySearchTests, SearchExistingValue) {
     EXPECT_EQ(*it, GetParam());
 }
 
-TEST_F(BinarySearchTests, SearchNonExistingElement) {
-    FAIL();
+TEST_P(BinarySearchTests, SearchNonExistingElement) {
+    const auto& it = dsa::binary_search(CONTAINER.cbegin(),
+                                        CONTAINER.cend(),
+                                        GetParam() + 1);
+    EXPECT_NE(*it, GetParam());
 }
 
-TEST_F(BinarySearchTests, SearchInEmptyContainer) {
-    FAIL();
+TEST(BinarySearchTests, SearchInEmptyContainer) {
+    std::vector<int> empty;
+    const auto& it = dsa::binary_search(empty.cbegin(), empty.cend(), 1);
+    EXPECT_EQ(it, empty.cend());
 }
