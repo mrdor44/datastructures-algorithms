@@ -12,6 +12,9 @@
 #include <cassert>
 
 template<typename T>
+class ListConstIterator;
+
+template<typename T>
 class List {
 public:
     List();
@@ -46,28 +49,15 @@ public:
     template<typename S>
     friend void swap(List<S>&, List<S>&) noexcept;
 
+    // Iteration
+    ListConstIterator<T> begin() const;
+    ListConstIterator<T> end() const;
+    ListConstIterator<T> cbegin() const;
+    ListConstIterator<T> cend() const;
+
+    // Node
     struct Node;
     using NodePtr = std::shared_ptr<Node>;
-
-    class const_iterator {
-    protected:
-        explicit const_iterator(const NodePtr&);
-
-    public:
-        virtual ~const_iterator() = default;
-
-        bool operator!=(const const_iterator&) const;
-        const_iterator& operator++();
-        const T& operator*() const;
-
-        friend class List<T>;
-
-    private:
-        NodePtr m_node;
-    };
-
-    const_iterator begin() const;
-    const_iterator end() const;
 
     struct Node {
         T value;
@@ -93,10 +83,43 @@ private:
 };
 
 template<typename T>
+class ListConstIterator {
+protected:
+    explicit ListConstIterator(const typename List<T>::NodePtr&);
+
+public:
+    ListConstIterator(const ListConstIterator&) = default;
+    ListConstIterator(ListConstIterator&&) = default;
+    virtual ~ListConstIterator() = default;
+    ListConstIterator& operator=(const ListConstIterator&) = default;
+    ListConstIterator& operator=(ListConstIterator&&) noexcept = default;
+
+    template<typename S>
+    friend bool operator==(const ListConstIterator<S>&, const ListConstIterator<S>&);
+    ListConstIterator& operator++();
+    const T& operator*() const;
+
+    friend class List<T>;
+
+public:
+    using difference_type = int;
+    using value_type = T;
+    using pointer = value_type*;
+    using reference = value_type&;
+    using iterator_category = std::input_iterator_tag;
+
+private:
+    typename List<T>::NodePtr m_node;
+};
+
+template<typename T>
 void swap(List<T>& list1, List<T>& list2) noexcept;
 
 template<typename T>
 inline List<T> operator+(List<T>, const List<T>&);
+
+template<typename S>
+bool operator!=(const typename List<S>::const_iterator&, const typename List<S>::const_iterator&);
 
 template<typename T>
 bool operator==(const List<T>& list1, const List<T>& list2) {
@@ -162,7 +185,7 @@ List<T>& List<T>::operator=(List<T> other) {
 }
 
 template<typename T>
-List<T>::const_iterator::const_iterator(const List::NodePtr& node) : m_node(node) {}
+ListConstIterator<T>::ListConstIterator(const typename List<T>::NodePtr& node) : m_node(node) {}
 
 template<typename T>
 void List<T>::push_front(const T& value) {
@@ -270,30 +293,46 @@ inline List<T> operator+(List<T> lhs, const List<T>& rhs) {
 }
 
 template<typename T>
-bool List<T>::const_iterator::operator!=(const List::const_iterator& other) const {
-    return m_node != other.m_node;
+bool operator!=(const ListConstIterator<T>& lhs, const ListConstIterator<T>& rhs) {
+    return !(lhs == rhs);
+}
+
+template<typename S>
+bool operator==(const ListConstIterator<S>& lhs, const ListConstIterator<S>& rhs) {
+    return lhs.m_node == rhs.m_node;
 }
 
 template<typename T>
-typename List<T>::const_iterator& List<T>::const_iterator::operator++() {
+ListConstIterator<T>& ListConstIterator<T>::operator++() {
     m_node = m_node->next;
     return *this;
 }
 
 template<typename T>
-const T& List<T>::const_iterator::operator*() const {
+const T& ListConstIterator<T>::operator*() const {
     return m_node->value;
 }
 
 template<typename T>
-typename List<T>::const_iterator List<T>::begin() const {
-    return const_iterator(m_first_dummy->next);
+ListConstIterator<T> List<T>::begin() const {
+    return ListConstIterator<T>(m_first_dummy->next);
 }
 
 template<typename T>
-typename List<T>::const_iterator List<T>::end() const {
-    return const_iterator(m_last_dummy);
+ListConstIterator<T> List<T>::end() const {
+    return ListConstIterator<T>(m_last_dummy);
 }
+
+template<typename T>
+ListConstIterator<T> List<T>::cbegin() const {
+    return ListConstIterator<T>(m_first_dummy->next);
+}
+
+template<typename T>
+ListConstIterator<T> List<T>::cend() const {
+    return ListConstIterator<T>(m_last_dummy);
+}
+
 
 template<typename T>
 typename List<T>::NodePtr List<T>::get_node(int index) const {
