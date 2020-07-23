@@ -15,13 +15,13 @@ namespace dsa {
 // for constant time performance
 template<typename Iterator, typename T>
 Iterator binary_search(Iterator begin, const Iterator& end, const T& value) {
-    int distance = std::distance(begin, end);
-    while (distance > 0) {
+    int span = std::distance(begin, end);
+    while (span > 0) {
         Iterator middle = begin;
-        std::advance(middle, distance / 2);
+        std::advance(middle, span / 2);
         if (value < *middle) {
-            // We would set end = middle, but that simply means the distance will be halved
-            distance /= 2;
+            // We would set end = middle, but that simply means the span will be halved
+            span /= 2;
             continue;
         }
         if (value == *middle) {
@@ -29,8 +29,7 @@ Iterator binary_search(Iterator begin, const Iterator& end, const T& value) {
         }
         assert(value > *middle);
         begin = middle;
-        distance -= distance / 2;
-        distance -= 1;
+        span -= span / 2;
     }
     return begin;
 }

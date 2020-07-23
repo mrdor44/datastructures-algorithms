@@ -3,6 +3,7 @@
     <option name="FORMATTER_TAGS_ENABLED" value="true" />
     <Objective-C>
       <option name="INDENT_NAMESPACE_MEMBERS" value="0" />
+      <option name="FUNCTION_CALL_ARGUMENTS_WRAP" value="5" />
       <option name="SPACE_BEFORE_POINTER_IN_DECLARATION" value="false" />
       <option name="SPACE_AFTER_POINTER_IN_DECLARATION" value="true" />
       <option name="SPACE_BEFORE_REFERENCE_IN_DECLARATION" value="false" />

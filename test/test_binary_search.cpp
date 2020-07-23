@@ -2,29 +2,26 @@
 #include "inc/binary_search.hpp"
 #include "mock.hpp"
 
-// TODO: Use Lists, std::array, classic array, strings
-class BinarySearchTests : public testing::Test {
-protected:
-    void SetUp() override {
-        Test::SetUp();
-        container = std::vector<int>({2, 4, 6, 8, 10, 12, 14, 16, 18, 20});
-    }
+using testing::ValuesIn;
 
-    std::vector<int> container;
+// TODO: Use Lists, std::array, classic array, strings
+class BinarySearchTests : public testing::TestWithParam<int> {
+public:
+    static const std::vector<int> CONTAINER;
 };
 
-TEST_F(BinarySearchTests, SearchExistingElement) {
-    // TODO: Search for all values
-    const auto& it = dsa::binary_search(container.cbegin(), container.cend(), 8);
-    EXPECT_EQ(*it, 8);
-}
+const std::vector<int> BinarySearchTests::CONTAINER({2, 4, 6, 8, 10, 12, 14, 16, 18, 20});
 
-TEST_F(BinarySearchTests, SearchFirstElement) {
-    FAIL();
-}
+INSTANTIATE_TEST_SUITE_P(ExistingValues,
+                         BinarySearchTests,
+                         ValuesIn(BinarySearchTests::CONTAINER),
+                         testing::PrintToStringParamName());
 
-TEST_F(BinarySearchTests, SearchLastElement) {
-    FAIL();
+TEST_P(BinarySearchTests, SearchExistingValue) {
+    const auto& it = dsa::binary_search(CONTAINER.cbegin(),
+                                        CONTAINER.cend(),
+                                        GetParam());
+    EXPECT_EQ(*it, GetParam());
 }
 
 TEST_F(BinarySearchTests, SearchNonExistingElement) {
