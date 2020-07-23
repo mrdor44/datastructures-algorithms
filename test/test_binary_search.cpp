@@ -5,31 +5,38 @@
 using testing::ValuesIn;
 
 // TODO: Use Lists, std::array, classic array, strings
-class BinarySearchTests : public testing::TestWithParam<int> {
-public:
-    static const std::vector<int> CONTAINER;
+template<typename T>
+class BinarySearchTests : public testing::Test {
+protected:
+    static const T CONTAINER;
 };
+TYPED_TEST_SUITE_P(BinarySearchTests);
 
-const std::vector<int> BinarySearchTests::CONTAINER({2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22});
+template<typename T>
+const T BinarySearchTests<T>::CONTAINER({2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22});
 
-INSTANTIATE_TEST_SUITE_P(ExistingValues,
-                         BinarySearchTests,
-                         ValuesIn(BinarySearchTests::CONTAINER),
-                         testing::PrintToStringParamName());
-
-TEST_P(BinarySearchTests, SearchExistingValue) {
-    const auto& it = dsa::binary_search(CONTAINER.cbegin(),
-                                        CONTAINER.cend(),
-                                        GetParam());
-    EXPECT_EQ(*it, GetParam());
+TYPED_TEST_P(BinarySearchTests, SearchExistingValues) {
+    for (int value : this->CONTAINER) {
+        const auto& it = dsa::binary_search(this->CONTAINER.cbegin(),
+                                            this->CONTAINER.cend(),
+                                            value);
+        EXPECT_EQ(*it, value);
+    }
 }
 
-TEST_P(BinarySearchTests, SearchNonExistingElement) {
-    const auto& it = dsa::binary_search(CONTAINER.cbegin(),
-                                        CONTAINER.cend(),
-                                        GetParam() + 1);
-    EXPECT_NE(*it, GetParam());
+TYPED_TEST_P(BinarySearchTests, SearchNonExistingElement) {
+    for (int value : this->CONTAINER) {
+        const auto& it = dsa::binary_search(this->CONTAINER.cbegin(),
+                                            this->CONTAINER.cend(),
+                                            value + 1);
+        EXPECT_NE(*it, value);
+    }
 }
+
+REGISTER_TYPED_TEST_SUITE_P(BinarySearchTests, SearchExistingValues, SearchNonExistingElement);
+
+using ContainerTypes = testing::Types<std::vector<int>>;
+INSTANTIATE_TYPED_TEST_SUITE_P(, BinarySearchTests, ContainerTypes);
 
 TEST(BinarySearchTests, SearchInEmptyContainer) {
     std::vector<int> empty;
