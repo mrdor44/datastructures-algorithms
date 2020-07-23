@@ -17,7 +17,7 @@ template<typename Iterator, typename T>
 Iterator binary_search(Iterator begin, const Iterator& end, const T& value) {
     int distance = std::distance(begin, end);
     while (distance > 0) {
-        const Iterator middle = begin;
+        Iterator middle = begin;
         std::advance(middle, distance / 2);
         if (value < *middle) {
             // We would set end = middle, but that simply means the distance will be halved
