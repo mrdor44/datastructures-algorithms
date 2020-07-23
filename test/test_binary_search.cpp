@@ -1,5 +1,6 @@
 #include <vector>
 #include <array>
+#include "inc/list.hpp"
 #include "inc/binary_search.hpp"
 #include "mock.hpp"
 
@@ -36,7 +37,7 @@ TYPED_TEST_P(BinarySearchTests, SearchNonExistingElement) {
 
 REGISTER_TYPED_TEST_SUITE_P(BinarySearchTests, SearchExistingValues, SearchNonExistingElement);
 
-using ContainerTypes = Types<std::vector<int>, std::array<int, 11>>;
+using ContainerTypes = Types<std::vector<int>, std::array<int, 11>, List<int>>;
 INSTANTIATE_TYPED_TEST_SUITE_P(, BinarySearchTests, ContainerTypes);
 
 TEST(BinarySearchTests, SearchInEmptyContainer) {
