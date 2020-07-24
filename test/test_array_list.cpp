@@ -34,25 +34,25 @@ TEST(ArrayList, PopAndReduceCapacity) {
     list.pop_back();
     ASSERT_EQ(16, list.capacity());
     list.pop_back();
-    ASSERT_EQ(7, list.length())
+    ASSERT_EQ(7, list.length());
     ASSERT_EQ(8, list.capacity());
     list.pop_back();
     ASSERT_EQ(8, list.capacity());
     list.pop_back();
     ASSERT_EQ(8, list.capacity());
     list.pop_back();
-    ASSERT_EQ(4, list.length())
+    ASSERT_EQ(4, list.length());
     ASSERT_EQ(8, list.capacity());
     list.pop_back();
-    ASSERT_EQ(3, list.length())
+    ASSERT_EQ(3, list.length());
     ASSERT_EQ(4, list.capacity());
     list.pop_back();
-    ASSERT_EQ(2, list.length())
+    ASSERT_EQ(2, list.length());
     ASSERT_EQ(4, list.capacity());
     list.pop_back();
-    ASSERT_EQ(1, list.length())
+    ASSERT_EQ(1, list.length());
     ASSERT_EQ(4, list.capacity());
     list.pop_back();
-    ASSERT_EQ(0, list.length())
+    ASSERT_EQ(0, list.length());
     ASSERT_EQ(4, list.capacity());
 }
