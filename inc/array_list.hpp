@@ -30,8 +30,12 @@ public:
     void push_back(Iterator, const Iterator&);
 
     // Retrieval
-    const T& operator[](int) const;
-    T& operator[](int);
+    [[nodiscard]] const T& back() const;
+    [[nodiscard]] const T& operator[](int) const;
+    [[nodiscard]] T& operator[](int);
+
+    // Status
+    [[nodiscard]] int capacity() const;
 
     // Iteration
     [[nodiscard]] ArrayListConstIterator<T> cbegin() const;
@@ -43,8 +47,8 @@ public:
 
 private:
     std::unique_ptr<T[]> m_array;
-    int m_length;
-    int m_capacity;
+    int m_length{};
+    int m_capacity{};
 
 private:
     void extend();
@@ -119,6 +123,11 @@ void ArrayList<T>::push_back(Iterator begin, const Iterator& end) {
 }
 
 template<typename T>
+const T& ArrayList<T>::back() const {
+    return m_array[m_length];
+}
+
+template<typename T>
 const T& ArrayList<T>::operator[](int index) const {
     return m_array[index];
 }
@@ -126,6 +135,11 @@ const T& ArrayList<T>::operator[](int index) const {
 template<typename T>
 T& ArrayList<T>::operator[](int index) {
     return m_array[index];
+}
+
+template<typename T>
+int ArrayList<T>::capacity() const {
+    return m_capacity;
 }
 
 template<typename T>
