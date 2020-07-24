@@ -79,6 +79,7 @@ private:
     ArrayListConstIterator(const ArrayList<T>&, int position);
 
 public:
+    ArrayListConstIterator() = default;
     ArrayListConstIterator(const ArrayListConstIterator&) = default;
     ArrayListConstIterator(ArrayListConstIterator&&) noexcept = default;
     virtual ~ArrayListConstIterator() = default;
@@ -86,13 +87,17 @@ public:
     ArrayListConstIterator& operator=(ArrayListConstIterator&&) = default;
 
     ArrayListConstIterator& operator++();
+    ArrayListConstIterator operator++(int);
+    ArrayListConstIterator& operator--();
+    ArrayListConstIterator operator--(int);
     const T& operator*() const;
+    const T* operator->() const;
 
 public:
     using difference_type = int;
     using value_type = T;
     using pointer = T*;
-    using reference = T&;
+    using reference = const value_type&;
     using iterator_category = std::input_iterator_tag;
 
 public:
@@ -110,6 +115,9 @@ bool operator==(const ArrayListConstIterator<T>&, const ArrayListConstIterator<T
 
 template<typename T>
 bool operator!=(const ArrayListConstIterator<T>&, const ArrayListConstIterator<T>&);
+
+template<typename T>
+void swap(ArrayListConstIterator<T>&, ArrayListConstIterator<T>&) noexcept;
 
 template<typename T>
 ArrayList<T>::ArrayList(int initial_capacity, int min_capacity):
@@ -242,8 +250,33 @@ ArrayListConstIterator<T>& ArrayListConstIterator<T>::operator++() {
 }
 
 template<typename T>
+ArrayListConstIterator<T> ArrayListConstIterator<T>::operator++(int) {
+    ArrayListConstIterator<T> before = *this;
+    ++m_position;
+    return before;
+}
+
+template<typename T>
+ArrayListConstIterator<T>& ArrayListConstIterator<T>::operator--() {
+    --m_position;
+    return *this;
+}
+
+template<typename T>
+ArrayListConstIterator<T> ArrayListConstIterator<T>::operator--(int) {
+    ArrayListConstIterator<T> before = *this;
+    --m_position;
+    return before;
+}
+
+template<typename T>
 const T& ArrayListConstIterator<T>::operator*() const {
     return (*m_array)[m_position];
+}
+
+template<typename T>
+const T* ArrayListConstIterator<T>::operator->() const {
+    return &(*m_array)[m_position];
 }
 
 template<typename T>
@@ -255,6 +288,12 @@ bool operator==(const ArrayListConstIterator<T>& lhs, const ArrayListConstIterat
 template<typename T>
 bool operator!=(const ArrayListConstIterator<T>& lhs, const ArrayListConstIterator<T>& rhs) {
     return !(lhs == rhs);
+}
+
+template<typename T>
+void swap(ArrayListConstIterator<T>& lhs, ArrayListConstIterator<T>& rhs) noexcept {
+    std::swap(lhs.m_array, rhs.m_array);
+    std::swap(lhs.m_position, rhs.m_position);
 }
 
 #endif //DATASTRUCTURES_ALGORITHMS_ARRAY_LIST_HPP
