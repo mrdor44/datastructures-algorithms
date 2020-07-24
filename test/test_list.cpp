@@ -44,7 +44,7 @@ TEST(List, PushPopBack) {
 
 class ListTest : public testing::Test {
 protected:
-    virtual void SetUp() {
+    void SetUp() override {
         list = List<int>({1, 2, 3, 4});
     }
 

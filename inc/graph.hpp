@@ -17,7 +17,7 @@ public:
     Graph() = default;
     virtual ~Graph() = default;
     Graph(const Graph&) = delete;
-    Graph(Graph&&) = default;
+    Graph(Graph&&) noexcept = default;
 
     class Node;
     using NodePtr = std::shared_ptr<Node>;

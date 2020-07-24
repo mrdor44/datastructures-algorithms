@@ -74,7 +74,7 @@ public:
 private:
     NodePtr m_first_dummy;
     NodePtr m_last_dummy;
-    int m_length;
+    int m_length{};
 
 private:
     NodePtr get_node(int) const;
@@ -89,7 +89,7 @@ protected:
 
 public:
     ListConstIterator(const ListConstIterator&) = default;
-    ListConstIterator(ListConstIterator&&) = default;
+    ListConstIterator(ListConstIterator&&) noexcept = default;
     virtual ~ListConstIterator() = default;
     ListConstIterator& operator=(const ListConstIterator&) = default;
     ListConstIterator& operator=(ListConstIterator&&) noexcept = default;
@@ -118,8 +118,8 @@ void swap(List<T>& list1, List<T>& list2) noexcept;
 template<typename T>
 inline List<T> operator+(List<T>, const List<T>&);
 
-template<typename S>
-bool operator!=(const typename List<S>::const_iterator&, const typename List<S>::const_iterator&);
+template<typename T>
+bool operator!=(const ListConstIterator<T>&, const ListConstIterator<T>&);
 
 template<typename T>
 bool operator==(const List<T>& list1, const List<T>& list2) {
@@ -347,14 +347,20 @@ template<typename T>
 void List<T>::insert_before(const NodePtr& node, const T& value) {
     NodePtr new_node = std::make_shared<Node>(value, node, node->prev);
     node->prev = new_node;
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnusedValue" // Clang mistakes this as unused
     new_node->prev->next = new_node;
+#pragma clang diagnostic pop
     ++m_length;
 }
 
 template<typename T>
 void List<T>::erase(const NodePtr node) {
     node->next->prev = node->prev;
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnusedValue" // Clang mistakes this as unused
     node->prev->next = node->next;
+#pragma clang diagnostic pop
     --m_length;
 }
 
