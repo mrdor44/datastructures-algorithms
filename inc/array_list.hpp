@@ -91,7 +91,7 @@ public:
     using value_type = T;
     using pointer = T*;
     using reference = const value_type&;
-    using iterator_category = std::input_iterator_tag;
+    using iterator_category = std::random_access_iterator_tag;
 
 public:
     ArrayListConstIterator& operator++();
@@ -101,7 +101,9 @@ public:
     const T& operator*() const;
     const T* operator->() const;
     ArrayListConstIterator& operator+=(difference_type);
+    difference_type operator-(const ArrayListConstIterator&);
     ArrayListConstIterator& operator-=(difference_type);
+    reference operator[](difference_type) const;
 
 public:
     friend class ArrayList<T>;
@@ -118,6 +120,18 @@ bool operator==(const ArrayListConstIterator<T>&, const ArrayListConstIterator<T
 
 template<typename T>
 bool operator!=(const ArrayListConstIterator<T>&, const ArrayListConstIterator<T>&);
+
+template<typename T>
+bool operator<(const ArrayListConstIterator<T>&, const ArrayListConstIterator<T>&);
+
+template<typename T>
+bool operator>(const ArrayListConstIterator<T>&, const ArrayListConstIterator<T>&);
+
+template<typename T>
+bool operator<=(const ArrayListConstIterator<T>&, const ArrayListConstIterator<T>&);
+
+template<typename T>
+bool operator>=(const ArrayListConstIterator<T>&, const ArrayListConstIterator<T>&);
 
 template<typename T>
 ArrayListConstIterator<T> operator+(ArrayListConstIterator<T>, typename ArrayListConstIterator<T>::difference_type);
@@ -302,9 +316,21 @@ ArrayListConstIterator<T>& ArrayListConstIterator<T>::operator+=(difference_type
 }
 
 template<typename T>
+typename ArrayListConstIterator<T>::difference_type
+ArrayListConstIterator<T>::operator-(const ArrayListConstIterator<T>& rhs) {
+    return m_position - rhs.m_position;
+}
+
+template<typename T>
 ArrayListConstIterator<T>& ArrayListConstIterator<T>::operator-=(difference_type distance) {
     m_position -= distance;
     return *this;
+}
+
+template<typename T>
+typename ArrayListConstIterator<T>::reference
+ArrayListConstIterator<T>::operator[](typename ArrayListConstIterator::difference_type distance) const {
+    return *(*this + distance);
 }
 
 template<typename T>
@@ -316,6 +342,26 @@ bool operator==(const ArrayListConstIterator<T>& lhs, const ArrayListConstIterat
 template<typename T>
 bool operator!=(const ArrayListConstIterator<T>& lhs, const ArrayListConstIterator<T>& rhs) {
     return !(lhs == rhs);
+}
+
+template<typename T>
+bool operator<(const ArrayListConstIterator<T>& lhs, const ArrayListConstIterator<T>& rhs) {
+    return rhs - lhs > 0;
+}
+
+template<typename T>
+bool operator>(const ArrayListConstIterator<T>& lhs, const ArrayListConstIterator<T>& rhs) {
+    return rhs < lhs;
+}
+
+template<typename T>
+bool operator<=(const ArrayListConstIterator<T>& lhs, const ArrayListConstIterator<T>& rhs) {
+    return !(lhs < rhs);
+}
+
+template<typename T>
+bool operator>=(const ArrayListConstIterator<T>& lhs, const ArrayListConstIterator<T>& rhs) {
+    return !(lhs > rhs);
 }
 
 template<typename T>
@@ -339,7 +385,7 @@ ArrayListConstIterator<T> operator-(ArrayListConstIterator<T> it,
 template<typename T>
 typename ArrayListConstIterator<T>::difference_type operator-(const ArrayListConstIterator<T>& lhs,
                                                               const ArrayListConstIterator<T>& rhs) {
-    return lhs.m_position - rhs.m_position;
+    return lhs.operator-(rhs);
 }
 
 template<typename T>
