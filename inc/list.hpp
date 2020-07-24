@@ -32,7 +32,7 @@ public:
     void push_front(const Iterator& start, const Iterator& end);
     void push_back(const T&);
     template<typename Iterator>
-    void push_back(const Iterator& start, const Iterator& end);
+    void push_back(Iterator begin, const Iterator& end);
     void pop_back();
     List& operator+=(const List&);
 
@@ -211,9 +211,9 @@ void List<T>::push_back(const T& value) {
 
 template<typename T>
 template<typename Iterator>
-void List<T>::push_back(const Iterator& start, const Iterator& end) {
-    for (Iterator i = start; i != end; ++i) {
-        push_back(*i);
+void List<T>::push_back(Iterator begin, const Iterator& end) {
+    for (; begin != end; ++begin) {
+        push_back(*begin);
     }
 }
 
