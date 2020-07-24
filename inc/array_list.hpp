@@ -18,10 +18,14 @@ public:
     static const int DEFAULT_INITIAL_CAPACITY;
 
 public:
-    explicit ArrayList(int initial_capacity = DEFAULT_INITIAL_CAPACITY);
+    ArrayList(int initial_capacity = DEFAULT_INITIAL_CAPACITY,
+              int min_capacity = DEFAULT_INITIAL_CAPACITY);
     ArrayList(const std::initializer_list<T>&);
     template<typename Iterator>
-    ArrayList(const Iterator&, const Iterator&, int initial_capacity = DEFAULT_INITIAL_CAPACITY);
+    ArrayList(const Iterator&,
+              const Iterator&,
+              int initial_capacity = DEFAULT_INITIAL_CAPACITY,
+              int min_capacity = DEFAULT_INITIAL_CAPACITY);
     virtual ~ArrayList() = default;
     ArrayList(const ArrayList&) = delete;
     ArrayList(ArrayList&&) noexcept = default;
@@ -54,7 +58,7 @@ private:
     std::unique_ptr<T[]> m_array;
     int m_length{};
     int m_capacity{};
-    const int m_min_capacity{};
+    int m_min_capacity{};
 
 private:
     void extend();
@@ -94,19 +98,20 @@ template<typename T>
 bool operator!=(const ArrayListConstIterator<T>&, const ArrayListConstIterator<T>&);
 
 template<typename T>
-ArrayList<T>::ArrayList(int initial_capacity):
+ArrayList<T>::ArrayList(int initial_capacity, int min_capacity):
         m_array(new T[initial_capacity]),
         m_length(0),
         m_capacity(initial_capacity),
-        m_min_capacity(initial_capacity) {}
+        m_min_capacity(min_capacity) {}
 
 template<typename T>
-ArrayList<T>::ArrayList(const std::initializer_list<T>& list) : ArrayList(list.begin(), list.end()) {}
+ArrayList<T>::ArrayList(const std::initializer_list<T>& list) :
+        ArrayList(list.begin(), list.end(), DEFAULT_INITIAL_CAPACITY) {}
 
 template<typename T>
 template<typename Iterator>
-ArrayList<T>::ArrayList(const Iterator& begin, const Iterator& end, int initial_capacity) :
-        ArrayList(initial_capacity) {
+ArrayList<T>::ArrayList(const Iterator& begin, const Iterator& end, int initial_capacity, int min_capacity) :
+        ArrayList(initial_capacity, min_capacity) {
     push_back(begin, end);
 }
 
@@ -185,12 +190,12 @@ ArrayListConstIterator<T> ArrayList<T>::cend() const {
 
 template<typename T>
 void ArrayList<T>::extend() {
-    *this = ArrayList<T>(cbegin(), cend(), 2 * m_capacity);
+    *this = ArrayList<T>(cbegin(), cend(), 2 * m_capacity, m_min_capacity);
 }
 
 template<typename T>
 void ArrayList<T>::shrink() {
-    *this = ArrayList<T>(cbegin(), cend(), m_capacity / 2);
+    *this = ArrayList<T>(cbegin(), cend(), m_capacity / 2, m_min_capacity);
 }
 
 template<typename T>
