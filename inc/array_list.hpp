@@ -27,7 +27,7 @@ public:
               int initial_capacity = DEFAULT_INITIAL_CAPACITY,
               int min_capacity = DEFAULT_INITIAL_CAPACITY);
     virtual ~ArrayList() = default;
-    ArrayList(const ArrayList&) = delete;
+    ArrayList(const ArrayList&);
     ArrayList(ArrayList&&) noexcept = default;
     ArrayList& operator=(ArrayList);
 
@@ -69,6 +69,9 @@ private:
 
 template<typename T>
 const int ArrayList<T>::DEFAULT_INITIAL_CAPACITY = 4;
+
+template<typename T>
+bool operator==(const ArrayList<T>&, const ArrayList<T>&);
 
 template<typename T>
 void swap(ArrayList<T>&, ArrayList<T>&) noexcept;
@@ -168,6 +171,10 @@ ArrayList<T>::ArrayList(const Iterator& begin, const Iterator& end, int initial_
 }
 
 template<typename T>
+ArrayList<T>::ArrayList(const ArrayList& other) :
+        ArrayList(other.begin(), other.end(), 1.5 * other.capacity(), other.m_min_capacity) {}
+
+template<typename T>
 ArrayList<T>& ArrayList<T>::operator=(ArrayList<T> rhs) {
     swap(*this, rhs);
     return *this;
@@ -258,6 +265,22 @@ void ArrayList<T>::extend() {
 template<typename T>
 void ArrayList<T>::shrink() {
     *this = ArrayList<T>(cbegin(), cend(), m_capacity / 2, m_min_capacity);
+}
+
+template<typename T>
+bool operator==(const ArrayList<T>& lhs, const ArrayList<T>& rhs) {
+    if (lhs.length() != rhs.length()) {
+        return false;
+    }
+    auto it1 = lhs.cbegin();
+    auto it2 = rhs.cbegin();
+    for (; it1 != lhs.cend(); ++it1, ++it2) {
+        assert(it2 != rhs.cend());
+        if (*it1 != *it2) {
+            return false;
+        }
+    }
+    return true;
 }
 
 template<typename T>
