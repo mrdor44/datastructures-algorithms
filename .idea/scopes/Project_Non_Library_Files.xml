@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Project Non-Library Files" pattern="file[datastructures-algorithms]:inc/*||file[datastructures-algorithms]:test/*" />
+</component>

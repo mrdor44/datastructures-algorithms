@@ -15,7 +15,7 @@ namespace dsa {
 // for constant time performance
 template<typename Iterator, typename T>
 Iterator binary_search(Iterator begin, const Iterator& end, const T& value) {
-    int span = std::distance(begin, end);
+    auto span = std::distance(begin, end);
     while (span > 0) {
         Iterator middle = begin;
         std::advance(middle, span / 2);
