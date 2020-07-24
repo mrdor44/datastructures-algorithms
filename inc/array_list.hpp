@@ -47,6 +47,8 @@ public:
     [[nodiscard]] int capacity() const;
 
     // Iteration
+    [[nodiscard]] ArrayListConstIterator<T> begin() const;
+    [[nodiscard]] ArrayListConstIterator<T> end() const;
     [[nodiscard]] ArrayListConstIterator<T> cbegin() const;
     [[nodiscard]] ArrayListConstIterator<T> cend() const;
 
@@ -75,11 +77,23 @@ template<typename T>
 class ArrayListConstIterator {
 private:
     ArrayListConstIterator(const ArrayList<T>&, int position);
-    virtual ~ArrayListConstIterator() = default;
 
 public:
+    ArrayListConstIterator(const ArrayListConstIterator&) = default;
+    ArrayListConstIterator(ArrayListConstIterator&&) noexcept = default;
+    virtual ~ArrayListConstIterator() = default;
+    ArrayListConstIterator& operator=(const ArrayListConstIterator&) = default;
+    ArrayListConstIterator& operator=(ArrayListConstIterator&&) = default;
+
     ArrayListConstIterator& operator++();
     const T& operator*() const;
+
+public:
+    using difference_type = int;
+    using value_type = T;
+    using pointer = T*;
+    using reference = T&;
+    using iterator_category = std::input_iterator_tag;
 
 public:
     friend class ArrayList<T>;
@@ -87,7 +101,7 @@ public:
     friend bool operator==(const ArrayListConstIterator<S>&, const ArrayListConstIterator<S>&);
 
 private:
-    const ArrayList<T>& m_array;
+    const ArrayList<T>* m_array;
     int m_position;
 };
 
@@ -179,6 +193,16 @@ int ArrayList<T>::capacity() const {
 }
 
 template<typename T>
+ArrayListConstIterator<T> ArrayList<T>::begin() const {
+    return ArrayListConstIterator<T>(*this, 0);
+}
+
+template<typename T>
+ArrayListConstIterator<T> ArrayList<T>::end() const {
+    return ArrayListConstIterator<T>(*this, m_length);
+}
+
+template<typename T>
 ArrayListConstIterator<T> ArrayList<T>::cbegin() const {
     return ArrayListConstIterator<T>(*this, 0);
 }
@@ -208,7 +232,7 @@ void swap(ArrayList<T>& lhs, ArrayList<T>& rhs) noexcept {
 
 template<typename T>
 ArrayListConstIterator<T>::ArrayListConstIterator(const ArrayList<T>& array, int position) :
-        m_array(array),
+        m_array(&array),
         m_position(position) {}
 
 template<typename T>
@@ -219,12 +243,13 @@ ArrayListConstIterator<T>& ArrayListConstIterator<T>::operator++() {
 
 template<typename T>
 const T& ArrayListConstIterator<T>::operator*() const {
-    return m_array[m_position];
+    return (*m_array)[m_position];
 }
 
 template<typename T>
 bool operator==(const ArrayListConstIterator<T>& lhs, const ArrayListConstIterator<T>& rhs) {
-    return lhs.m_position == rhs.m_position;
+    return lhs.m_array == rhs.m_array &&
+           lhs.m_position == rhs.m_position;
 }
 
 template<typename T>
