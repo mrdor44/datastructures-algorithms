@@ -7,25 +7,26 @@
 
 using testing::Types;
 
-template<typename T>
+template<typename Container>
 class MergeSortTests : public testing::Test {
 protected:
-    static const T CONTAINER;
+    static const Container UNSORTED;
+    static const Container SORTED;
 };
-TYPED_TEST_SUITE_P(MergeSortTests);
 
-template<typename T>
-const T MergeSortTests<T>::CONTAINER({2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22});
+template<typename Container>
+const Container MergeSortTests<Container>::UNSORTED({6, 7, 3, 8, 1, 5, 7, 10, 2, 8});
 
-TYPED_TEST_P(MergeSortTests, Sort) {
-    T sorted = merge_sort(this->CONTAINER);
-    FAIL(); // check if sorted
+template<typename Container>
+const Container MergeSortTests<Container>::SORTED({1, 2, 3, 5, 6, 7, 7, 8, 8, 10});
+
+using ContainerTypes = Types<std::vector<int>, std::array<int, 11>, ArrayList<int>>;
+TYPED_TEST_SUITE(MergeSortTests, ContainerTypes);
+
+TYPED_TEST(MergeSortTests, Sort) {
+    TypeParam sorted = merge_sort(this->UNSORTED);
+    EXPECT_EQ(this->SORTED, sorted);
 }
-
-REGISTER_TYPED_TEST_SUITE_P(MergeSortTests, Sort);
-
-using ContainerTypes = Types<std::vector<int>, std::array<int, 11>, List<int>, ArrayList<int>>;
-INSTANTIATE_TYPED_TEST_SUITE_P(, MergeSortTests, ContainerTypes);
 
 TEST(MergeSortTests, SortEmptyContainer) {
     std::vector<int> empty;

@@ -7,7 +7,7 @@
 
 template<typename Container>
 Container merge_sort(Container& container) {
-
+    return container;
 }
 
 #endif //DATASTRUCTURES_ALGORITHMS_MERGE_SORT_HPP
