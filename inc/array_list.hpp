@@ -28,7 +28,7 @@ public:
               int min_capacity = DEFAULT_INITIAL_CAPACITY);
     virtual ~ArrayList() = default;
     ArrayList(const ArrayList&);
-    ArrayList(ArrayList&&) noexcept = default;
+    ArrayList(ArrayList&&) noexcept;
     ArrayList& operator=(ArrayList);
 
     // Insertion & Removal
@@ -44,6 +44,7 @@ public:
 
     // Status
     [[nodiscard]] int length() const;
+    [[nodiscard]] int size() const;
     [[nodiscard]] int capacity() const;
 
     // Iteration
@@ -98,9 +99,9 @@ public:
 
 public:
     ArrayListConstIterator& operator++();
-    ArrayListConstIterator operator++(int);
+    const ArrayListConstIterator operator++(int);
     ArrayListConstIterator& operator--();
-    ArrayListConstIterator operator--(int);
+    const ArrayListConstIterator operator--(int);
     const T& operator*() const;
     const T* operator->() const;
     ArrayListConstIterator& operator+=(difference_type);
@@ -175,6 +176,12 @@ ArrayList<T>::ArrayList(const ArrayList& other) :
         ArrayList(other.begin(), other.end(), 1.5 * other.capacity(), other.m_min_capacity) {}
 
 template<typename T>
+ArrayList<T>::ArrayList(ArrayList&& other) noexcept :
+        ArrayList() {
+    swap(*this, other);
+}
+
+template<typename T>
 ArrayList<T>& ArrayList<T>::operator=(ArrayList<T> rhs) {
     swap(*this, rhs);
     return *this;
@@ -233,6 +240,11 @@ int ArrayList<T>::length() const {
 }
 
 template<typename T>
+int ArrayList<T>::size() const {
+    return length();
+}
+
+template<typename T>
 int ArrayList<T>::capacity() const {
     return m_capacity;
 }
@@ -285,7 +297,7 @@ bool operator==(const ArrayList<T>& lhs, const ArrayList<T>& rhs) {
 
 template<typename T>
 void swap(ArrayList<T>& lhs, ArrayList<T>& rhs) noexcept {
-    std::swap(lhs.m_array, rhs.m_array);
+    lhs.m_array.swap(rhs.m_array);
     std::swap(lhs.m_length, rhs.m_length);
     std::swap(lhs.m_capacity, rhs.m_capacity);
     std::swap(lhs.m_min_capacity, rhs.m_min_capacity);
@@ -303,7 +315,7 @@ ArrayListConstIterator<T>& ArrayListConstIterator<T>::operator++() {
 }
 
 template<typename T>
-ArrayListConstIterator<T> ArrayListConstIterator<T>::operator++(int) {
+const ArrayListConstIterator<T> ArrayListConstIterator<T>::operator++(int) {
     ArrayListConstIterator<T> before = *this;
     ++m_position;
     return before;
@@ -316,7 +328,7 @@ ArrayListConstIterator<T>& ArrayListConstIterator<T>::operator--() {
 }
 
 template<typename T>
-ArrayListConstIterator<T> ArrayListConstIterator<T>::operator--(int) {
+const ArrayListConstIterator<T> ArrayListConstIterator<T>::operator--(int) {
     ArrayListConstIterator<T> before = *this;
     --m_position;
     return before;
