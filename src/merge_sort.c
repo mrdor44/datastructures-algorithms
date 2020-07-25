@@ -31,6 +31,7 @@ static t_array merge_sort_from_to(t_array array, int begin, int end) {
     if (1 == end - begin) {
         sorted.length = 1;
         sorted.array = malloc(sorted.length * sizeof(*sorted.array));
+        sorted.array[0] = array.array[begin];
         goto l_cleanup;
     }
 
