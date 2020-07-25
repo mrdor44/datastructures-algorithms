@@ -1,34 +1,22 @@
 #include <vector>
-#include <array>
-#include "inc/list.hpp"
-#include "inc/array_list.hpp"
-#include "inc/merge_sort.hpp"
 #include "mock.hpp"
 
-using testing::Types;
+extern "C" {
+#include "inc/merge_sort.h"
+}
 
-template<typename Container>
-class MergeSortTests : public testing::Test {
-protected:
-    static const Container UNSORTED;
-    static const Container SORTED;
-};
+static std::vector<int> UNSORTED({6, 7, 3, 8, 1, 5, 7, 10, 2, 8, 11});
 
-template<typename Container>
-const Container MergeSortTests<Container>::UNSORTED({6, 7, 3, 8, 1, 5, 7, 10, 2, 8});
+static std::vector<int> SORTED({1, 2, 3, 5, 6, 7, 7, 8, 8, 10, 11});
 
-template<typename Container>
-const Container MergeSortTests<Container>::SORTED({1, 2, 3, 5, 6, 7, 7, 8, 8, 10});
-
-using ContainerTypes = Types<ArrayList<int>>;
-TYPED_TEST_SUITE(MergeSortTests, ContainerTypes);
-
-TYPED_TEST(MergeSortTests, Sort) {
-    TypeParam sorted = merge_sort(this->UNSORTED);
-    EXPECT_EQ(this->SORTED, sorted);
+TEST(MergeSortTests, Sort) {
+    int* raw_sorted = merge_sort(UNSORTED.data(), UNSORTED.size());
+    std::vector<int> sorted(raw_sorted, raw_sorted + UNSORTED.size());
+    EXPECT_EQ(SORTED, sorted);
+    FREE(raw_sorted);
 }
 
 TEST(MergeSortTests, SortEmptyContainer) {
     std::vector<int> empty;
-    merge_sort(empty);
+    merge_sort(empty.data(), empty.size());
 }
