@@ -14,6 +14,7 @@ set(
         inc/graph_scanner.hpp
         inc/binary_search.hpp
         inc/array_list.hpp
+        inc/merge_sort.hpp
 )
 
 set(CUTIE_DIR Cutie)
@@ -25,6 +26,7 @@ add_cutie_test_target(TEST test/test_queue.cpp SOURCES ${HEADERS})
 add_cutie_test_target(TEST test/test_graph.cpp SOURCES ${HEADERS})
 add_cutie_test_target(TEST test/test_tree.cpp SOURCES ${HEADERS})
 add_cutie_test_target(TEST test/test_binary_search.cpp SOURCES ${HEADERS})
-add_cutie_test_target(TEST test/test_array_list.cpp SORUCES ${HEADERS})
+add_cutie_test_target(TEST test/test_array_list.cpp SOURCES ${HEADERS})
+add_cutie_test_target(TEST test/test_merge_sort.cpp SOURCES ${HEADERS})
 add_cutie_all_tests_target()
 add_cutie_coverage_targets()
