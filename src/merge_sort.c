@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <memory.h>
 #include "inc/merge_sort.h"
 
 typedef struct {
@@ -11,39 +12,22 @@ typedef struct {
     int length;
 } t_array;
 
-static t_array merge_sort_from_to(t_array, int begin, int end);
 static t_array merge(t_array, t_array);
+static int min(int, int);
 
-int* merge_sort(int array[], int length) { // NOLINT(readability-non-const-parameter)
-    const t_array input_array = {.array = array, .length = length};
-    return merge_sort_from_to(input_array, 0, length).array;
-}
-
-static t_array merge_sort_from_to(t_array array, int begin, int end) {
-    t_array sorted = {.array = NULL, .length = 0};
-    t_array left = {.array = NULL, .length = 0};
-    t_array right = {.array = NULL, .length = 0};
-
-    if (begin >= end) {
-        goto l_cleanup;
+void merge_sort(int array[], int length) { // NOLINT(readability-non-const-parameter)
+    for (int current_length = 1; current_length <= length; current_length *= 2) {
+        int begin1 = 0;
+        int begin2 = current_length;
+        for (; begin2 < length; begin1 = begin2 + current_length, begin2 = begin1 + current_length) {
+            int end2 = min(begin2 + current_length, length);
+            t_array array1 = {.array = &array[begin1], .length = current_length};
+            t_array array2 = {.array = &array[begin2], .length = end2 - begin2};
+            t_array merged = merge(array1, array2);
+            memcpy(array1.array, merged.array, merged.length * sizeof(merged.array[0]));
+            FREE(merged.array);
+        }
     }
-
-    if (1 == end - begin) {
-        sorted.length = 1;
-        sorted.array = malloc(sorted.length * sizeof(*sorted.array));
-        sorted.array[0] = array.array[begin];
-        goto l_cleanup;
-    }
-
-    const int middle = (begin + end) / 2;
-    left = merge_sort_from_to(array, begin, middle);
-    right = merge_sort_from_to(array, middle, end);
-    sorted = merge(left, right);
-
-l_cleanup:
-    FREE(right.array);
-    FREE(left.array);
-    return sorted;
 }
 
 static t_array merge(t_array array1, t_array array2) {
@@ -77,4 +61,8 @@ static t_array merge(t_array array1, t_array array2) {
 
 l_cleanup:
     return result;
+}
+
+static int min(int x, int y) {
+    return x < y ? x : y;
 }
