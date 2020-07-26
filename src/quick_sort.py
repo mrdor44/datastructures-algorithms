@@ -1,14 +1,19 @@
 from statistics import median
 
 
-def _partition(lst, pivot_index):
+def _partition(lst):
+    """
+    Partition a list in place using it's last element as the pivot
+    :param lst: The list to partition
+    :return: The new position of the pivot element
+    """
     next_below_pivot_index = 0
-    for i, value in enumerate(lst):
-        if value > lst[pivot_index] or i == pivot_index:
+    for i in range(len(lst) - 1):  # Don't consider the pivot element
+        if lst[i] > lst[-1]:
             continue
         lst[i], lst[next_below_pivot_index] = lst[next_below_pivot_index], lst[i]
         next_below_pivot_index += 1
-    lst[next_below_pivot_index], lst[pivot_index] = lst[pivot_index], lst[next_below_pivot_index]
+    lst[next_below_pivot_index], lst[-1] = lst[-1], lst[next_below_pivot_index]
     return next_below_pivot_index
 
 
@@ -23,7 +28,8 @@ def quicksort(lst):
         return []
 
     pivot_index = _get_pivot_index(lst)
-    pivot_index = _partition(lst, pivot_index)
+    lst[pivot_index], lst[-1] = lst[-1], lst[pivot_index]
+    pivot_index = _partition(lst)
     left = lst[:pivot_index]
     right = lst[pivot_index + 1:]
 
