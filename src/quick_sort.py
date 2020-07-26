@@ -26,19 +26,20 @@ def _get_pivot_index(lst, begin, end):
     return next(i for i in candidate_indices if lst[i] == m)
 
 
-def quicksort(lst, begin=None, end=None):
-    begin = begin or 0
-    end = end or len(lst)
+def quicksort(lst):
+    spans = [(0, len(lst))]
 
-    if end - begin <= 1:
-        return
+    while len(spans) != 0:
+        begin, end = spans.pop()
+        if end - begin <= 1:
+            continue
 
-    pivot_index = _get_pivot_index(lst, begin, end)
-    lst[pivot_index], lst[end - 1] = lst[end - 1], lst[pivot_index]
-    pivot_index = _partition(lst, begin, end)
+        pivot_index = _get_pivot_index(lst, begin, end)
+        lst[pivot_index], lst[end - 1] = lst[end - 1], lst[pivot_index]
+        pivot_index = _partition(lst, begin, end)
 
-    quicksort(lst, begin, pivot_index)
-    quicksort(lst, pivot_index + 1, end)
+        spans.append((begin, pivot_index))
+        spans.append((pivot_index + 1, end))
 
 
 def quicksorted(lst):
