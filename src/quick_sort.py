@@ -17,18 +17,22 @@ def _partition(lst):
     return next_below_pivot_index
 
 
-def _get_pivot_index(lst):
-    candidate_indices = [0, len(lst) // 2, -1]
+def _get_pivot_index(lst, begin, end):
+    candidate_indices = [begin, (begin + end) // 2, end - 1]
     m = median(map(lst.__getitem__, candidate_indices))
     return next(i for i in candidate_indices if lst[i] == m)
 
 
-def quicksort(lst):
+def quicksort(lst, begin=None, end=None):
     if len(lst) == 0:
         return []
 
-    pivot_index = _get_pivot_index(lst)
-    lst[pivot_index], lst[-1] = lst[-1], lst[pivot_index]
+    begin = begin or 0
+    end = end or len(lst)
+
+    pivot_index = _get_pivot_index(lst, begin, end)
+    lst[pivot_index], lst[end - 1] = lst[end - 1], lst[pivot_index]
+    lst = lst[begin:end]
     pivot_index = _partition(lst)
     left = lst[:pivot_index]
     right = lst[pivot_index + 1:]
