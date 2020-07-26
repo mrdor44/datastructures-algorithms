@@ -16,6 +16,6 @@ do {                    \
     }                   \
 } while (false)
 
-int* merge_sort(int array[], int length);
+void merge_sort(int array[], int length);
 
 #endif //DATASTRUCTURES_ALGORITHMS_MERGE_SORT_H
