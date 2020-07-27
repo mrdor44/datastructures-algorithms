@@ -10,9 +10,6 @@ class _INode(object):
     def has_children(self):
         raise NotImplementedError()
 
-    def delete(self, word, depth):
-        raise NotImplementedError()
-
 
 class _Node(_INode):
     _children: List[Optional[_INode]]
@@ -59,18 +56,6 @@ class _Node(_INode):
     def words(self):
         return map(''.join, self._words())
 
-    def delete(self, word, depth):
-        if depth == len(word):
-            self.is_end_of_word = False
-            return
-        c = ord(word[depth]) - ord('a')
-        child = self._children[c]
-        if child is None:
-            return
-        child.delete(word, depth + 1)
-        if not child.has_children and not child.is_end_of_word:
-            self._children[c] = None
-
 
 class Trie(object):
     def __init__(self):
@@ -95,4 +80,14 @@ class Trie(object):
         return current.is_end_of_word
 
     def delete(self, word):
-        self._root.delete(word, 0)
+        nodes_stack = []
+        current = self._root
+        for char in word:
+            nodes_stack.insert(0, (current, char))
+            current = current[char]
+            if current is None:
+                return
+        current.is_end_of_word = False
+        for node, char in nodes_stack:
+            if not node[char].has_children and node[char].is_end_of_word:
+                node[char] = None
