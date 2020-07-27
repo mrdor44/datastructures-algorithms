@@ -21,6 +21,10 @@ do {                        \
     (b) = temp;             \
 } while (false)
 
+inline int max(int a, int b) {
+    return a > b ? a : b;
+}
+
 typedef enum {
     RETURNCODE_INVALID_VALUE = -1,
     RETURNCODE_SUCCESS = 0,
@@ -33,6 +37,9 @@ typedef enum {
     RETURNCODE_MINHEAP_PUSH_INVALID_PARAMETERS,
     RETURNCODE_MINHEAP_GET_MIN_INVALID_PARAMETERS,
     RETURNCODE_MINHEAP_GET_MIN_HEAP_EMPTY,
+
+    RETURNCODE_MINHEAP_POP_MIN_INVALID_PARAMETERS,
+    RETURNCODE_MINHEAP_POP_MIN_HEAP_EMPTY,
 } t_returncode;
 
 #endif //DATASTRUCTURES_ALGORITHMS_COMMON_H

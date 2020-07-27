@@ -22,6 +22,12 @@ protected:
         EXPECT_SUCCESS(MINHEAP_push(heap, value));
     }
 
+    int pop() {
+        int min = 0;
+        EXPECT_SUCCESS(MINHEAP_pop_min(heap, &min));
+        return min;
+    }
+
     int get_min() {
         int min = 0;
         EXPECT_SUCCESS(MINHEAP_get_min(heap, &min));
@@ -33,8 +39,14 @@ protected:
 };
 
 TEST_F(MinHeapTests, MinHeap) {
-    for (int i = 1; i < 30; ++i) {
+    static const int NUM_ELEMENTS = 30;
+
+    for (int i = 1; i < NUM_ELEMENTS + 1; ++i) {
         push(i);
         EXPECT_EQ(1, get_min());
+    }
+
+    for (int i = 1; i < NUM_ELEMENTS + 1; ++i) {
+        EXPECT_EQ(i, pop());
     }
 }

@@ -38,6 +38,7 @@ public:
     void pop_back();
 
     // Retrieval
+    [[nodiscard]] T& back();
     [[nodiscard]] const T& back() const;
     [[nodiscard]] const T& operator[](int) const;
     [[nodiscard]] T& operator[](int);
@@ -217,6 +218,11 @@ void ArrayList<T>::pop_back() {
     if (m_length < capacity() / 2) {
         shrink();
     }
+}
+
+template<typename T>
+T& ArrayList<T>::back() {
+    return m_array[m_length - 1];
 }
 
 template<typename T>
