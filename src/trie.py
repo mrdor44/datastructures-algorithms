@@ -18,6 +18,7 @@ class _Node(_INode):
         # TODO: Dynamic children allocation
         self._children: List[Optional[_Node]]
         self._children = [None] * (ord('z') - ord('a') + 1)
+        self._num_children = 0
         self._is_end_of_word = False
 
     @property
@@ -30,8 +31,7 @@ class _Node(_INode):
 
     @property
     def has_children(self):
-        # TODO: Make linear
-        return any(c is not None for c in self._children)
+        return self._num_children > 0
 
     def __getitem__(self, char: str):
         assert len(char) == 1
@@ -39,7 +39,12 @@ class _Node(_INode):
 
     def __setitem__(self, char: str, node):
         assert len(char) == 1
-        self._children[ord(char) - ord('a')] = node
+        index = ord(char) - ord('a')
+        if self._children[index] is None and node is not None:
+            self._num_children += 1
+        if self._children[index] is not None and node is None:
+            self._num_children -= 1
+        self._children[index] = node
 
     def _words(self) -> List[List[str]]:
         words: List[List[str]] = []
