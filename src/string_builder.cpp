@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "inc/string_builder.hpp"
-
+#include "inc/common.h"
 
 struct s_node {
     char* string;
@@ -52,18 +52,18 @@ l_cleanup:
     return sb;
 }
 
-t_stringbuilder_returncode STRINGBUILDER_append(t_stringbuilder sb, const char* string) {
-    t_stringbuilder_returncode returncode = STRINGBUILDER_RETURNCODE_INVALID_VALUE;
+t_returncode STRINGBUILDER_append(t_stringbuilder sb, const char* string) {
+    t_returncode returncode = RETURNCODE_INVALID_VALUE;
     t_node new_node = nullptr;
 
     if ((nullptr == sb) || (nullptr == string)) {
-        returncode = STRINGBUILDER_RETURNCODE_APPEND_INVALID_PARAMETERS;
+        returncode = RETURNCODE_STRINGBUILDER_APPEND_INVALID_PARAMETERS;
         goto l_cleanup;
     }
 
     new_node = stringbuilder_node_create(string);
     if (nullptr == new_node) {
-        returncode = STRINGBUILDER_RETURNCODE_APPEND_NODE_CREATE_FAILED;
+        returncode = RETURNCODE_STRINGBUILDER_APPEND_NODE_CREATE_FAILED;
         goto l_cleanup;
     }
 
@@ -73,26 +73,26 @@ t_stringbuilder_returncode STRINGBUILDER_append(t_stringbuilder sb, const char* 
     sb->last = new_node;
     new_node = nullptr;
 
-    returncode = STRINGBUILDER_RETURNCODE_SUCCESS;
+    returncode = RETURNCODE_SUCCESS;
 
 l_cleanup:
     STRINGBUILDER_NODE_DESTROY(new_node);
     return returncode;
 }
 
-t_stringbuilder_returncode STRINGBUILDER_str(t_stringbuilder sb, char** p_string) {
-    t_stringbuilder_returncode returncode = STRINGBUILDER_RETURNCODE_INVALID_VALUE;
+t_returncode STRINGBUILDER_str(t_stringbuilder sb, char** p_string) {
+    t_returncode returncode = RETURNCODE_INVALID_VALUE;
     char* string = nullptr;
     int next_pos = 0;
 
     if ((nullptr == sb) || (nullptr == p_string)) {
-        returncode = STRINGBUILDER_RETURNCODE_STR_INVALID_PARAMETERS;
+        returncode = RETURNCODE_STRINGBUILDER_STR_INVALID_PARAMETERS;
         goto l_cleanup;
     }
 
     string = static_cast<char*>(malloc((sb->length + 1) * sizeof(*string)));
     if (nullptr == string) {
-        returncode = STRINGBUILDER_RETURNCODE_STR_MALLOC_FAILED;
+        returncode = RETURNCODE_STRINGBUILDER_STR_MALLOC_FAILED;
         goto l_cleanup;
     }
 
@@ -104,7 +104,7 @@ t_stringbuilder_returncode STRINGBUILDER_str(t_stringbuilder sb, char** p_string
     *p_string = string;
     string = nullptr;
 
-    returncode = STRINGBUILDER_RETURNCODE_SUCCESS;
+    returncode = RETURNCODE_SUCCESS;
 
 l_cleanup:
     FREE(string);
