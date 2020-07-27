@@ -15,7 +15,7 @@ typedef struct s_minheap* t_minheap;
 
 t_minheap MINHEAP_create();
 
-t_minheap MINHEAP_create(int*, int*);
+t_minheap MINHEAP_create(const int*, const int*);
 
 void MINHEAP_destroy(t_minheap);
 

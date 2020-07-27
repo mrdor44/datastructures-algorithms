@@ -38,7 +38,7 @@ l_cleanup:
     return heap;
 }
 
-t_minheap MINHEAP_create(int* begin, int* end) {
+t_minheap MINHEAP_create(const int* begin, const int* end) {
     t_minheap heap = nullptr;
     bool is_success = false;
 

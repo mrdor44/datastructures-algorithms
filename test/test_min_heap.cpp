@@ -8,28 +8,36 @@ using testing::NotNull;
 class MinHeap {
 public:
     MinHeap();
-    MinHeap(int*, int*);
+    explicit MinHeap(const std::vector<int>&);
+    MinHeap(const int*, const int*);
     virtual ~MinHeap();
+
+private:
+    explicit MinHeap(const t_minheap&);
+
+public:
     void push(int);
     int pop();
     int get_min();
-
+    std::vector<int> to_vector();
     bool is_empty();
+
 private:
     t_minheap m_heap;
 };
 
-MinHeap::MinHeap() : m_heap(MINHEAP_create()) {
-    EXPECT_THAT(m_heap, NotNull());
-}
+MinHeap::MinHeap() : MinHeap(MINHEAP_create()) {}
 
-MinHeap::MinHeap(int* begin, int* end) :
-        m_heap(MINHEAP_create(begin, end)) {
-    EXPECT_THAT(m_heap, NotNull());
-}
+MinHeap::MinHeap(const std::vector<int>& v) : MinHeap(v.data(), v.data() + v.size()) {}
+
+MinHeap::MinHeap(const int* begin, const int* end) : MinHeap(MINHEAP_create(begin, end)) {}
 
 MinHeap::~MinHeap() {
     MINHEAP_DESTROY(m_heap);
+}
+
+MinHeap::MinHeap(const t_minheap& heap) : m_heap(heap) {
+    EXPECT_THAT(m_heap, NotNull());
 }
 
 void MinHeap::push(int value) {
@@ -46,6 +54,14 @@ int MinHeap::get_min() {
     int min = 0;
     EXPECT_SUCCESS(MINHEAP_get_min(m_heap, &min));
     return min;
+}
+
+std::vector<int> MinHeap::to_vector() {
+    std::vector<int> v;
+    while (!is_empty()) {
+        v.push_back(pop());
+    }
+    return v;
 }
 
 bool MinHeap::is_empty() {
@@ -69,12 +85,9 @@ TEST(MinHeapTests, PushGetMinPop) {
 
 TEST(MinHeapTests, Heapify) {
     std::vector<int> v({8, 2, 9, 3, 5, 7, 1});
-    MinHeap heap(v.data(), v.data() + v.size());
+    MinHeap heap(v);
 
-    std::vector<int> heapified;
-    while (!heap.is_empty()) {
-        heapified.push_back(heap.pop());
-    }
+    std::vector<int> heapified = heap.to_vector();
     std::sort(v.begin(), v.end());
     EXPECT_EQ(v, heapified);
 }
