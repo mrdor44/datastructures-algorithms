@@ -13,6 +13,9 @@ class TrieTests(unittest.TestCase):
         for w in _WORDS:
             self.assertTrue(t.hasword(w))
             self.assertFalse(t.hasword(w + 'z'))
+        for w in _WORDS:
+            t.delete(w)
+            self.assertFalse(t.hasword(w))
 
 
 if __name__ == '__main__':

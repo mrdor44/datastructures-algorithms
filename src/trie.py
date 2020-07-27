@@ -1,9 +1,25 @@
-from typing import List, Any, Union
+from typing import List, Optional
 
 
-class _Node(object):
+class _INode(object):
+    @property
+    def is_end_of_word(self):
+        raise NotImplementedError()
+
+    @property
+    def has_children(self):
+        raise NotImplementedError()
+
+    def delete(self, word, depth):
+        raise NotImplementedError()
+
+
+class _Node(_INode):
+    _children: List[Optional[_INode]]
+
     def __init__(self):
         # TODO: Dynamic children allocation
+        self._children: List[Optional[_Node]]
         self._children = [None] * (ord('z') - ord('a') + 1)
         self._is_end_of_word = False
 
@@ -14,6 +30,11 @@ class _Node(object):
     @is_end_of_word.setter
     def is_end_of_word(self, is_end_of_word: bool):
         self._is_end_of_word = is_end_of_word
+
+    @property
+    def has_children(self):
+        # TODO: Make linear
+        return any(c is not None for c in self._children)
 
     def __getitem__(self, char: str):
         assert len(char) == 1
@@ -31,11 +52,24 @@ class _Node(object):
             if node is None:
                 continue
             word: List[str]
+            node: _Node
             words.extend([chr(i + ord('a'))] + word for word in node._words())
         return words
 
     def words(self):
         return map(''.join, self._words())
+
+    def delete(self, word, depth):
+        if depth == len(word):
+            self.is_end_of_word = False
+            return
+        c = ord(word[depth]) - ord('a')
+        child = self._children[c]
+        if child is None:
+            return
+        child.delete(word, depth + 1)
+        if not child.has_children and not child.is_end_of_word:
+            self._children[c] = None
 
 
 class Trie(object):
@@ -59,3 +93,6 @@ class Trie(object):
             if current is None:
                 return False
         return current.is_end_of_word
+
+    def delete(self, word):
+        self._root.delete(word, 0)
