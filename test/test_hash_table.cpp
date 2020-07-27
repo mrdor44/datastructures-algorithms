@@ -57,10 +57,15 @@ unsigned int HashTable::simple_hash(int n) {
     return abs(n);
 }
 
-TEST(MinHeapTests, InsertGetRemove) {
+class HashTableTests : public testing::TestWithParam<int> {
+};
+
+INSTANTIATE_TEST_SUITE_P(, HashTableTests, testing::Range(1, 10000, 10));
+
+TEST_P(HashTableTests, InsertGetRemove) {
     static const int NUM_ELEMENTS = 10000;
 
-    HashTable htable(10);
+    HashTable htable(GetParam());
 
     for (int i = 1; i < NUM_ELEMENTS + 1; ++i) {
         htable.insert(i, i + 1);

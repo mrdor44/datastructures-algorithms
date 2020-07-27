@@ -27,6 +27,10 @@ t_hashtable HASHTABLE_create(int num_buckets, hash_function hash) {
     t_hashtable htable = NULL;
     bool is_success = false;
 
+    if ((0 == num_buckets) || (NULL == hash)) {
+        goto l_cleanup;
+    }
+
     htable = malloc(sizeof(*htable));
     if (NULL == htable) {
         goto l_cleanup;
