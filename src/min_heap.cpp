@@ -2,20 +2,18 @@
 // Created by dor on 27/07/2020.
 //
 
-#include <memory>
 #include "inc/array_list.hpp"
 #include "inc/min_heap.hpp"
 
 struct s_minheap {
-    std::unique_ptr<ArrayList<int>> array;
+    ArrayList<int>* array;
 };
 
 static inline int minheap_parent(int);
 static inline int minheap_left(int);
 static inline int minheap_right(int);
 static void minheap_sift_up(t_minheap);
-static void minheap_sift_down(t_minheap);
-
+static void minheap_sift_down(t_minheap, int node = 0);
 
 t_minheap MINHEAP_create() {
     t_minheap heap = nullptr;
@@ -26,7 +24,38 @@ t_minheap MINHEAP_create() {
         goto l_cleanup;
     }
 
-    heap->array = std::make_unique<ArrayList<int>>();
+    heap->array = new(std::nothrow) ArrayList<int>;
+    if (nullptr == heap->array) {
+        goto l_cleanup;
+    }
+
+    is_success = true;
+
+l_cleanup:
+    if (!is_success) {
+        MINHEAP_DESTROY(heap);
+    }
+    return heap;
+}
+
+t_minheap MINHEAP_create(int* begin, int* end) {
+    t_minheap heap = nullptr;
+    bool is_success = false;
+
+    heap = MINHEAP_create();
+    if (nullptr == heap) {
+        goto l_cleanup;
+    }
+
+    try {
+        heap->array->push_back(begin, end);
+    } catch (...) {
+        goto l_cleanup;
+    }
+
+    for (int current = heap->array->length() - 1; current >= 0; --current) {
+        minheap_sift_down(heap, current);
+    }
 
     is_success = true;
 
@@ -41,7 +70,9 @@ void MINHEAP_destroy(t_minheap heap) {
     if (nullptr == heap) {
         return;
     }
-    heap->array.reset(nullptr);
+    if (nullptr != heap->array) {
+        delete heap->array;
+    }
     FREE(heap);
 }
 
@@ -107,6 +138,13 @@ l_cleanup:
     return returncode;
 }
 
+bool MINHEAP_is_empty(t_minheap heap) {
+    if (nullptr == heap) {
+        return true;
+    }
+    return heap->array->length() == 0;
+}
+
 int minheap_parent(int n) {
     assert(n > 0);
     return (n - 1) / 2;
@@ -132,10 +170,10 @@ void minheap_sift_up(t_minheap heap) {
     }
 }
 
-void minheap_sift_down(t_minheap heap) {
+void minheap_sift_down(t_minheap heap, int node) {
     assert(nullptr != heap);
     auto& array = *heap->array;
-    for (int current = 0; minheap_left(current) < array.length();) {
+    for (int current = node; minheap_left(current) < array.length();) {
         const int left_value = array[minheap_left(current)];
         const int right_value = minheap_right(current) < array.length() ?
                                 array[minheap_right(current)] :
