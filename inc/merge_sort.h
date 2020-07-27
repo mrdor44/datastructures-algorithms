@@ -7,14 +7,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-
-#define FREE(p)         \
-do {                    \
-    if (NULL != (p)) {  \
-        free((p));      \
-        (p) = NULL;     \
-    }                   \
-} while (false)
+#include "common.h"
 
 void merge_sort(int array[], int length);
 
