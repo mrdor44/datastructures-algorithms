@@ -1,3 +1,6 @@
+from typing import List, Any, Union
+
+
 class _Node(object):
     def __init__(self):
         # TODO: Dynamic children allocation
@@ -20,15 +23,19 @@ class _Node(object):
         assert len(char) == 1
         self._children[ord(char) - ord('a')] = node
 
-    def words(self):
-        words = []
+    def _words(self) -> List[List[str]]:
+        words: List[List[str]] = []
         if self.is_end_of_word:
-            words.append('')
+            words.append([''])
         for i, node in enumerate(self._children):
             if node is None:
                 continue
-            words.extend(f"{chr(i + ord('a'))}{word}" for word in node.words())
+            word: List[str]
+            words.extend([chr(i + ord('a'))] + word for word in node._words())
         return words
+
+    def words(self):
+        return map(''.join, self._words())
 
 
 class Trie(object):
