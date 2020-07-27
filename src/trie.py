@@ -1,24 +1,9 @@
-from typing import List, Optional
+from typing import List
 
 
-class _INode(object):
-    @property
-    def is_end_of_word(self):
-        raise NotImplementedError()
-
-    @property
-    def has_children(self):
-        raise NotImplementedError()
-
-
-class _Node(_INode):
-    _children: List[Optional[_INode]]
-
+class _Node(object):
     def __init__(self):
-        # TODO: Dynamic children allocation
-        self._children: List[Optional[_Node]]
-        self._children = [None] * (ord('z') - ord('a') + 1)
-        self._num_children = 0
+        self._child_by_char = {}
         self._is_end_of_word = False
 
     @property
@@ -31,31 +16,24 @@ class _Node(_INode):
 
     @property
     def has_children(self):
-        return self._num_children > 0
+        return len(self._child_by_char)
 
     def __getitem__(self, char: str):
-        assert len(char) == 1
-        return self._children[ord(char) - ord('a')]
+        return self._child_by_char.get(char)
 
     def __setitem__(self, char: str, node):
-        assert len(char) == 1
-        index = ord(char) - ord('a')
-        if self._children[index] is None and node is not None:
-            self._num_children += 1
-        if self._children[index] is not None and node is None:
-            self._num_children -= 1
-        self._children[index] = node
+        self._child_by_char[char] = node
 
     def _words(self) -> List[List[str]]:
         words: List[List[str]] = []
         if self.is_end_of_word:
             words.append([''])
-        for i, node in enumerate(self._children):
+        for char, node in self._child_by_char.items():
             if node is None:
                 continue
             word: List[str]
             node: _Node
-            words.extend([chr(i + ord('a'))] + word for word in node._words())
+            words.extend([char] + word for word in node._words())
         return words
 
     def words(self):
