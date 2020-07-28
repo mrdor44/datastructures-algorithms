@@ -176,6 +176,8 @@ List<T>::List(List&& other) noexcept : List() {
 template<typename T>
 List<T>::~List() {
     clear();
+    m_first_dummy->next = nullptr;
+    m_last_dummy->prev = nullptr;
 }
 
 template<typename T>

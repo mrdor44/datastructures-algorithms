@@ -42,6 +42,14 @@ TEST(List, PushPopBack) {
     EXPECT_EQ(1, list.length());
 }
 
+TEST(List, InsertBeyondLength) {
+    EXPECT_THROW(List<int>().insert(2, 1), std::out_of_range);
+}
+
+TEST(List, EraseBeyondLength) {
+    EXPECT_THROW(List<int>().erase(2), std::out_of_range);
+}
+
 class ListTest : public testing::Test {
 protected:
     void SetUp() override {
