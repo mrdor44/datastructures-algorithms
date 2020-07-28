@@ -18,7 +18,7 @@ public:
     static const int DEFAULT_INITIAL_CAPACITY;
 
 public:
-    ArrayList(int initial_capacity = DEFAULT_INITIAL_CAPACITY,
+    explicit ArrayList(int initial_capacity = DEFAULT_INITIAL_CAPACITY,
               int min_capacity = DEFAULT_INITIAL_CAPACITY);
     ArrayList(const std::initializer_list<T>&);
     template<typename Iterator>
@@ -89,7 +89,7 @@ public:
     ArrayListConstIterator(ArrayListConstIterator&&) noexcept = default;
     virtual ~ArrayListConstIterator() = default;
     ArrayListConstIterator& operator=(const ArrayListConstIterator&) = default;
-    ArrayListConstIterator& operator=(ArrayListConstIterator&&) = default;
+    ArrayListConstIterator& operator=(ArrayListConstIterator&&) noexcept = default;
 
 public:
     using difference_type = int;
@@ -100,9 +100,9 @@ public:
 
 public:
     ArrayListConstIterator& operator++();
-    const ArrayListConstIterator operator++(int);
+    ArrayListConstIterator operator++(int);
     ArrayListConstIterator& operator--();
-    const ArrayListConstIterator operator--(int);
+    ArrayListConstIterator operator--(int);
     const T& operator*() const;
     const T* operator->() const;
     ArrayListConstIterator& operator+=(difference_type);
@@ -117,7 +117,7 @@ public:
 
 private:
     const ArrayList<T>* m_array;
-    difference_type m_position;
+    difference_type m_position{};
 };
 
 template<typename T>
@@ -321,7 +321,7 @@ ArrayListConstIterator<T>& ArrayListConstIterator<T>::operator++() {
 }
 
 template<typename T>
-const ArrayListConstIterator<T> ArrayListConstIterator<T>::operator++(int) {
+ArrayListConstIterator<T> ArrayListConstIterator<T>::operator++(int) {
     ArrayListConstIterator<T> before = *this;
     ++m_position;
     return before;
@@ -334,7 +334,7 @@ ArrayListConstIterator<T>& ArrayListConstIterator<T>::operator--() {
 }
 
 template<typename T>
-const ArrayListConstIterator<T> ArrayListConstIterator<T>::operator--(int) {
+ArrayListConstIterator<T> ArrayListConstIterator<T>::operator--(int) {
     ArrayListConstIterator<T> before = *this;
     --m_position;
     return before;

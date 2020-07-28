@@ -40,6 +40,7 @@ public:
     virtual ~Node() = default;
     NodePtr add_neighbor(const T&);
     void add_neighbor(const NodePtr&);
+    void remove_neighbor(int);
     const NodePtr& neighbor(int) const;
     const List<NodePtr>& neighbors() const;
     [[nodiscard]] bool is_visited() const;
@@ -131,6 +132,11 @@ void Graph<T>::Node::add_neighbor(const NodePtr& neighbor) {
 }
 
 template<typename T>
+void Graph<T>::Node::remove_neighbor(int index) {
+    m_neighbors.erase(index);
+}
+
+template<typename T>
 const typename Graph<T>::NodePtr& Graph<T>::Node::neighbor(int index) const {
     return neighbors()[index];
 }
@@ -208,6 +214,5 @@ void Graph<T>::DFSScanner::apply(const std::function<void(const T&)>& function) 
         to_visit.push(node->neighbors().begin(), node->neighbors().end());
     }
 }
-
 
 #endif //DATASTRUCTURES_ALGORITHMS_GRAPH_HPP

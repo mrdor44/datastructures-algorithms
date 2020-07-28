@@ -1,4 +1,5 @@
 #include <vector>
+#include <cstdlib>
 #include "mock.hpp"
 #include "test/common.hpp"
 
@@ -6,7 +7,26 @@ extern "C" {
 #include "inc/hash_table.h"
 }
 
+//@formatter:off
+DECLARE_HOOKABLE(malloc);
+//@formatter:on
+
+static int g_times_to_call_original_malloc = 0;
+
+void* __STUB__malloc(size_t __size) noexcept {
+    EXPECT_GE(g_times_to_call_original_malloc, 0);
+    if (0 == g_times_to_call_original_malloc) {
+        return nullptr;
+    }
+    SCOPE_REMOVE_HOOK(malloc);
+    --g_times_to_call_original_malloc;
+    return malloc(__size);
+}
+
 using testing::NotNull;
+using testing::IsNull;
+using testing::_;
+using testing::Return;
 
 class HashTable {
 public:
@@ -20,8 +40,9 @@ public:
     void insert(int key, int value);
     void remove(int key);
     int operator[](int key);
+    operator t_hashtable(); // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
 
-private:
+public:
     static unsigned int simple_hash(int);
 
 private:
@@ -53,6 +74,10 @@ int HashTable::operator[](int key) {
     return value;
 }
 
+HashTable::operator t_hashtable() {
+    return m_htable;
+}
+
 unsigned int HashTable::simple_hash(int n) {
     return abs(n);
 }
@@ -74,5 +99,53 @@ TEST_P(HashTableTests, InsertGetRemove) {
 
     for (int i = 1; i < NUM_ELEMENTS / 2; ++i) {
         htable.remove(i);
+        EXPECT_EQ(RETURNCODE_HASHTABLE_REMOVE_KEY_NOT_FOUND,
+                  HASHTABLE_remove(htable, i));
+        EXPECT_EQ(RETURNCODE_HASHTABLE_GET_KEY_NOT_FOUND,
+                  HASHTABLE_get(htable, i, nullptr));
     }
+}
+
+TEST(InvalidParameters, Create) {
+    EXPECT_THAT(HASHTABLE_create(0, nullptr), IsNull());
+    HASHTABLE_destroy(nullptr);
+    EXPECT_EQ(RETURNCODE_HASHTABLE_INSERT_INVALID_PARAMETERS,
+              HASHTABLE_insert(nullptr, 0, 0));
+    EXPECT_EQ(RETURNCODE_HASHTABLE_REMOVE_INVALID_PARAMETERS,
+              HASHTABLE_remove(nullptr, 0));
+    EXPECT_EQ(RETURNCODE_HASHTABLE_GET_INVALID_PARAMETERS,
+              HASHTABLE_get(nullptr, 0, nullptr));
+}
+
+TEST(WhiteBox, CreateStructMallocFailure) {
+    auto htable = reinterpret_cast<t_hashtable>(0x1000);
+    {
+        g_times_to_call_original_malloc = 0;
+        INSTALL_HOOK(malloc, __STUB__malloc);
+        htable = HASHTABLE_create(10, HashTable::simple_hash);
+    }
+    EXPECT_THAT(htable, IsNull());
+}
+
+TEST(WhiteBox, CreateMallocBucketsFailure) {
+    auto htable = reinterpret_cast<t_hashtable>(0x1000);
+    {
+        g_times_to_call_original_malloc = 1;
+        INSTALL_HOOK(malloc, __STUB__malloc);
+        htable = HASHTABLE_create(10, HashTable::simple_hash);
+    }
+    EXPECT_THAT(htable, IsNull());
+}
+
+TEST(WhiteBox, InsertMallocFailure) {
+    HashTable htable(10);
+    t_returncode returncode = RETURNCODE_INVALID_VALUE;
+    {
+        g_times_to_call_original_malloc = 0;
+        INSTALL_HOOK(malloc, __STUB__malloc);
+        returncode = HASHTABLE_insert(htable, 0, 0);
+    }
+    EXPECT_EQ(RETURNCODE_HASHTABLE_INSERT_MALLOC_FAILED, returncode);
+    htable.insert(0, 0);
+    EXPECT_EQ(0, htable[0]);
 }
