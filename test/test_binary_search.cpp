@@ -32,7 +32,9 @@ TYPED_TEST_P(BinarySearchTests, SearchNonExistingElement) {
         const auto& it = dsa::binary_search(this->CONTAINER.cbegin(),
                                             this->CONTAINER.cend(),
                                             value + 1);
-        EXPECT_NE(*it, value);
+        if (it != this->CONTAINER.cend()) {
+            EXPECT_NE(*it, value);
+        }
     }
 }
 
