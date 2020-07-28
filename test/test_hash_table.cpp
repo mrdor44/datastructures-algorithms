@@ -40,6 +40,7 @@ public:
     void insert(int key, int value);
     void remove(int key);
     int operator[](int key);
+    operator t_hashtable(); // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
 
 public:
     static unsigned int simple_hash(int);
@@ -73,6 +74,10 @@ int HashTable::operator[](int key) {
     return value;
 }
 
+HashTable::operator t_hashtable() {
+    return m_htable;
+}
+
 unsigned int HashTable::simple_hash(int n) {
     return abs(n);
 }
@@ -94,11 +99,22 @@ TEST_P(HashTableTests, InsertGetRemove) {
 
     for (int i = 1; i < NUM_ELEMENTS / 2; ++i) {
         htable.remove(i);
+        EXPECT_EQ(RETURNCODE_HASHTABLE_REMOVE_KEY_NOT_FOUND,
+                  HASHTABLE_remove(htable, i));
+        EXPECT_EQ(RETURNCODE_HASHTABLE_GET_KEY_NOT_FOUND,
+                  HASHTABLE_get(htable, i, nullptr));
     }
 }
 
 TEST(InvalidParameters, Create) {
     EXPECT_THAT(HASHTABLE_create(0, nullptr), IsNull());
+    HASHTABLE_destroy(nullptr);
+    EXPECT_EQ(RETURNCODE_HASHTABLE_INSERT_INVALID_PARAMETERS,
+              HASHTABLE_insert(nullptr, 0, 0));
+    EXPECT_EQ(RETURNCODE_HASHTABLE_REMOVE_INVALID_PARAMETERS,
+              HASHTABLE_remove(nullptr, 0));
+    EXPECT_EQ(RETURNCODE_HASHTABLE_GET_INVALID_PARAMETERS,
+              HASHTABLE_get(nullptr, 0, nullptr));
 }
 
 TEST(WhiteBox, CreateStructMallocFailure) {
@@ -119,4 +135,17 @@ TEST(WhiteBox, CreateMallocBucketsFailure) {
         htable = HASHTABLE_create(10, HashTable::simple_hash);
     }
     EXPECT_THAT(htable, IsNull());
+}
+
+TEST(WhiteBox, InsertMallocFailure) {
+    HashTable htable(10);
+    t_returncode returncode = RETURNCODE_INVALID_VALUE;
+    {
+        g_times_to_call_original_malloc = 0;
+        INSTALL_HOOK(malloc, __STUB__malloc);
+        returncode = HASHTABLE_insert(htable, 0, 0);
+    }
+    EXPECT_EQ(RETURNCODE_HASHTABLE_INSERT_MALLOC_FAILED, returncode);
+    htable.insert(0, 0);
+    EXPECT_EQ(0, htable[0]);
 }
