@@ -5,6 +5,7 @@ using testing::Test;
 
 class GraphTest : public Test {
 protected:
+protected:
     void SetUp() override {
         Test::SetUp();
 
@@ -30,13 +31,19 @@ protected:
         const auto& bottom7 = top7->add_neighbor(7);
         bottom7->add_neighbor(n4);
         const auto& n5 = n3->add_neighbor(5);
-        const auto& bottom8 = n5->add_neighbor(8);
+        bottom8 = n5->add_neighbor(8);
         bottom8->add_neighbor(n2);
         const auto& n6 = n5->add_neighbor(6);
         n6->add_neighbor(bottom7);
     }
 
+    void TearDown() override {
+        bottom8->remove_neighbor(0); // To break the circle
+        Test::TearDown();
+    }
+
     Graph<int> graph;
+    Graph<int>::NodePtr bottom8;
 };
 
 TEST_F(GraphTest, BFS) {
@@ -58,6 +65,10 @@ TEST(EmptyGraph, DFS) {
 }
 
 TEST(Graph, Circle) {
+    // 1 --> 2 --> 3
+    // ^           |
+    // |           |
+    // +-----------+
     Graph<int> graph;
     const Graph<int>::NodePtr& n1 = graph.add_root(1);
     const Graph<int>::NodePtr& n2 = n1->add_neighbor(2);
@@ -67,4 +78,5 @@ TEST(Graph, Circle) {
     EXPECT_EQ(2, n1->neighbor(0)->value);
     EXPECT_EQ(3, n1->neighbor(0)->neighbor(0)->value);
     EXPECT_EQ(1, n1->neighbor(0)->neighbor(0)->neighbor(0)->value);
+    n3->remove_neighbor(0);
 }

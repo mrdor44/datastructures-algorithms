@@ -40,6 +40,7 @@ public:
     virtual ~Node() = default;
     NodePtr add_neighbor(const T&);
     void add_neighbor(const NodePtr&);
+    void remove_neighbor(int);
     const NodePtr& neighbor(int) const;
     const List<NodePtr>& neighbors() const;
     [[nodiscard]] bool is_visited() const;
@@ -128,6 +129,11 @@ typename Graph<T>::NodePtr Graph<T>::Node::add_neighbor(const T& neighbor_value)
 template<typename T>
 void Graph<T>::Node::add_neighbor(const NodePtr& neighbor) {
     m_neighbors.push_back(neighbor);
+}
+
+template<typename T>
+void Graph<T>::Node::remove_neighbor(int index) {
+    m_neighbors.erase(index);
 }
 
 template<typename T>
