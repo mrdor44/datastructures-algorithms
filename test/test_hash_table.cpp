@@ -1,4 +1,5 @@
 #include <vector>
+#include <cstdlib>
 #include "mock.hpp"
 #include "test/common.hpp"
 
@@ -6,7 +7,26 @@ extern "C" {
 #include "inc/hash_table.h"
 }
 
+//@formatter:off
+DECLARE_HOOKABLE(malloc);
+//@formatter:on
+
+static int g_times_to_call_original_malloc = 0;
+
+void* __STUB__malloc(size_t __size) noexcept {
+    EXPECT_GE(g_times_to_call_original_malloc, 0);
+    if (0 == g_times_to_call_original_malloc) {
+        return nullptr;
+    }
+    SCOPE_REMOVE_HOOK(malloc);
+    --g_times_to_call_original_malloc;
+    return malloc(__size);
+}
+
 using testing::NotNull;
+using testing::IsNull;
+using testing::_;
+using testing::Return;
 
 class HashTable {
 public:
@@ -21,7 +41,7 @@ public:
     void remove(int key);
     int operator[](int key);
 
-private:
+public:
     static unsigned int simple_hash(int);
 
 private:
@@ -75,4 +95,28 @@ TEST_P(HashTableTests, InsertGetRemove) {
     for (int i = 1; i < NUM_ELEMENTS / 2; ++i) {
         htable.remove(i);
     }
+}
+
+TEST(InvalidParameters, Create) {
+    EXPECT_THAT(HASHTABLE_create(0, nullptr), IsNull());
+}
+
+TEST(WhiteBox, CreateStructMallocFailure) {
+    auto htable = reinterpret_cast<t_hashtable>(0x1000);
+    {
+        g_times_to_call_original_malloc = 0;
+        INSTALL_HOOK(malloc, __STUB__malloc);
+        htable = HASHTABLE_create(10, HashTable::simple_hash);
+    }
+    EXPECT_THAT(htable, IsNull());
+}
+
+TEST(WhiteBox, CreateMallocBucketsFailure) {
+    auto htable = reinterpret_cast<t_hashtable>(0x1000);
+    {
+        g_times_to_call_original_malloc = 1;
+        INSTALL_HOOK(malloc, __STUB__malloc);
+        htable = HASHTABLE_create(10, HashTable::simple_hash);
+    }
+    EXPECT_THAT(htable, IsNull());
 }
