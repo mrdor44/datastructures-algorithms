@@ -49,6 +49,14 @@ TEST_F(GraphTest, DFS) {
               List<int>({1, 2, 3, 4, 9, 8, 7, 7, 5, 8, 6}));
 }
 
+TEST(EmptyGraph, BFS) {
+    EXPECT_EQ(List<int>(), Graph<int>().bfs().collect<List<int>>());
+}
+
+TEST(EmptyGraph, DFS) {
+    EXPECT_EQ(List<int>(), Graph<int>().dfs().collect<List<int>>());
+}
+
 TEST(Graph, Circle) {
     Graph<int> graph;
     const Graph<int>::NodePtr& n1 = graph.add_root(1);

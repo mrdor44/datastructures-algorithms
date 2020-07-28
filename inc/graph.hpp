@@ -209,5 +209,4 @@ void Graph<T>::DFSScanner::apply(const std::function<void(const T&)>& function) 
     }
 }
 
-
 #endif //DATASTRUCTURES_ALGORITHMS_GRAPH_HPP
